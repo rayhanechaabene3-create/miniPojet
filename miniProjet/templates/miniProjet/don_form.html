@@ -1,0 +1,23 @@
+{% extends 'miniProjet/base.html' %}
+
+{% block content %}
+<div class="row mb-4">
+    <div class="col-md-6 mx-auto">
+        <div class="card shadow-sm border-danger border-top border-3">
+            <div class="card-body p-4">
+                <h3 class="mb-4 text-danger">Enregistrer un Don</h3>
+                <p class="text-muted">Remplissez ce formulaire pour ajouter un don à votre historique. L'hôpital devra valider cette information.</p>
+                
+                <form method="post">
+                    {% csrf_token %}
+                    {{ form.as_p }}
+                    <div class="mt-4">
+                        <button type="submit" class="btn btn-primary px-4">Déclarer le don</button>
+                        <a href="{% url 'dashboard_donneur' %}" class="btn btn-outline-secondary ms-2">Annuler</a>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,106 @@
+{% extends 'miniProjet/base.html' %}
+
+{% block content %}
+<div class="row mb-4">
+    <div class="col-12 d-flex justify-content-between align-items-center">
+        <h2 class="text-danger"><i class="bi bi-speedometer2"></i> Tableau de Bord Administrateur</h2>
+        <a href="{% url 'export_donneurs_csv' %}" class="btn btn-outline-success"><i class="bi bi-file-earmark-spreadsheet"></i> Exporter la Liste des Donneurs (CSV)</a>
+    </div>
+</div>
+
+<div class="row mb-4">
+    <div class="col-md-6 mb-3">
+        <div class="card shadow-sm text-center border-danger border-2">
+            <div class="card-body">
+                <h5 class="card-title text-muted">Total des Donneurs</h5>
+                <h2 class="display-4 fw-bold text-danger">{{ total_donneurs }}</h2>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-6 mb-3">
+        <div class="card shadow-sm text-center border-danger border-2">
+            <div class="card-body">
+                <h5 class="card-title text-muted">Total des Dons Enregistrés</h5>
+                <h2 class="display-4 fw-bold text-danger">{{ total_dons }}</h2>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row">
+    <!-- Validation des hôpitaux -->
+    <div class="col-md-6 mb-4">
+        <div class="card shadow-sm h-100">
+            <div class="card-body">
+                <h4 class="card-title text-danger mb-4"><i class="bi bi-building"></i> Validation des Hôpitaux</h4>
+                {% if hopitaux_attente %}
+                    <ul class="list-group">
+                        {% for hopital in hopitaux_attente %}
+                        <li class="list-group-item d-flex justify-content-between align-items-center">
+                            <div>
+                                <strong>{{ hopital.nom }}</strong><br>
+                                <small class="text-muted">{{ hopital.ville }} - Agrement: {{ hopital.agrement }}</small>
+                            </div>
+                            <form method="post" action="{% url 'valider_hopital' hopital.id %}">
+                                {% csrf_token %}
+                                <button type="submit" class="btn btn-success btn-sm"><i class="bi bi-check-circle"></i> Valider</button>
+                            </form>
+                        </li>
+                        {% endfor %}
+                    </ul>
+                {% else %}
+                    <div class="alert alert-success mt-3"><i class="bi bi-check-circle-fill"></i> Tous les hôpitaux inscrits ont été validés.</div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+
+    <!-- Demandes Actives (Groupe Sanguin & Ville) -->
+    <div class="col-md-6 mb-4">
+        <div class="card shadow-sm h-100">
+            <div class="card-body">
+                <h4 class="card-title text-danger mb-4"><i class="bi bi-bar-chart"></i> Demandes Actives</h4>
+                
+                <ul class="nav nav-tabs" id="myTab" role="tablist">
+                    <li class="nav-item" role="presentation">
+                        <button class="nav-link active text-danger fw-bold" id="groupe-tab" data-bs-toggle="tab" data-bs-target="#groupe" type="button" role="tab">Par Groupe Sanguin</button>
+                    </li>
+                    <li class="nav-item" role="presentation">
+                        <button class="nav-link text-danger fw-bold" id="ville-tab" data-bs-toggle="tab" data-bs-target="#ville" type="button" role="tab">Par Ville</button>
+                    </li>
+                </ul>
+                <div class="tab-content mt-3" id="myTabContent">
+                    <div class="tab-pane fade show active p-2" id="groupe" role="tabpanel">
+                        {% if demandes_actives %}
+                            <ul class="list-group list-group-flush">
+                                {% for demande in demandes_actives %}
+                                <li class="list-group-item d-flex justify-content-between align-items-center">
+                                    Groupe Sanguin {{ demande.groupe_sanguin }}
+                                    <span class="badge bg-danger rounded-pill fs-6">{{ demande.total }}</span>
+                                </li>
+                                {% endfor %}
+                            </ul>
+                        {% else %}
+                            <p class="text-muted">Aucune demande active.</p>
+                        {% endif %}
+                    </div>
+                    <div class="tab-pane fade p-2" id="ville" role="tabpanel">
+                        {% if demandes_par_ville %}
+                            <ul class="list-group list-group-flush">
+                                {% for demande in demandes_par_ville %}
+                                <li class="list-group-item d-flex justify-content-between align-items-center">
+                                    Ville de {{ demande.hopital__ville }}
+                                    <span class="badge bg-danger rounded-pill fs-6">{{ demande.total }}</span>
+                                </li>
+                                {% endfor %}
+                            </ul>
+                        {% else %}
+                            <p class="text-muted">Aucune demande active.</p>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

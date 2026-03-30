@@ -1,0 +1,41 @@
+{% extends 'miniProjet/base.html' %}
+
+{% block content %}
+<div class="row mb-4">
+    <div class="col-md-8 mx-auto">
+        <div class="card shadow-sm">
+            <div class="card-body p-4">
+                <h3 class="mb-4 text-danger">Modifier mon profil Donneur</h3>
+                
+                <form method="post" action="{% url 'toggle_activation_donneur' %}" class="mb-4 text-end">
+                    {% csrf_token %}
+                    {% if user.donneur.actif %}
+                        <button type="submit" class="btn btn-outline-warning">Mettre en pause mon compte (Indisponible)</button>
+                    {% else %}
+                        <button type="submit" class="btn btn-success">Réactiver mon compte (Disponible)</button>
+                    {% endif %}
+                </form>
+
+                <form method="post">
+                    {% csrf_token %}
+                    <h5 class="mb-3 text-secondary">Informations personnelles</h5>
+                    {{ user_form.as_p }}
+                    
+                    <h5 class="mb-3 mt-4 text-secondary">Informations médicales</h5>
+                    {{ form.as_p }}
+                    
+                    <button type="submit" class="btn btn-primary mt-3 px-4">Enregistrer les modifications</button>
+                    <a href="{% url 'dashboard_donneur' %}" class="btn btn-outline-secondary mt-3 ms-2">Annuler</a>
+                </form>
+                
+                <hr class="mt-5">
+                <div class="text-danger">
+                    <h5>Zone Dangereuse</h5>
+                    <p>La suppression de votre compte est définitive.</p>
+                    <a href="{% url 'delete_account' %}" class="btn btn-danger btn-sm">Supprimer mon compte</a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

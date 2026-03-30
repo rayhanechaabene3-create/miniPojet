@@ -1,0 +1,19 @@
+{% extends 'magasin/base.html' %}
+
+{% block title %} Détail produit {% endblock %}
+
+{% block content %}
+
+<div class="container mt-4">
+    <h2>{{produit.libelle}}</h2>
+
+    <img src="/media/{{produit.image}}" width="300">
+
+    <p><b>Description :</b> {{produit.description}}</p>
+    <p><b>Prix :</b> {{produit.prix}}</p>
+    <p><b>Type :</b> {{produit.type}}</p>
+    <p><b>Catégorie :</b> {{produit.categorie}}</p>
+    <p><b>Fournisseur :</b> {{produit.Fournisseur}}</p>
+</div>
+
+{% endblock %}

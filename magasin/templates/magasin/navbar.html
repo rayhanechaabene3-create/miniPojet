@@ -1,0 +1,26 @@
+<div class="row">
+
+    <!-- Menu gauche -->
+    <div class="col-3">
+        <div class="list-group">
+
+            <!-- afficher tous les produits -->
+            <a href="" class="list-group-item list-group-item-action">
+                Tous les produits
+            </a>
+
+
+        </div>
+    </div>
+
+    <!-- partie produits -->
+    <div class="col-9">
+        {% for produit in produits %}
+            <div>
+                <h5>{{ produit.nom }}</h5>
+                <p>{{ produit.prix }}</p>
+            </div>
+        {% endfor %}
+    </div>
+
+</div>

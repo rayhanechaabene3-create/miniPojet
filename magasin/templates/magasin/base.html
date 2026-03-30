@@ -1,0 +1,367 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}MonSite{% endblock %}</title>
+
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600&family=Playfair+Display:wght@500&display=swap" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" rel="stylesheet">
+    <link rel="stylesheet" type="text/css" href="{% static 'css/base.css' %}">
+
+    <style>
+        :root {
+            --sidebar-width: 240px;
+            --navbar-height: 60px;
+            --bg: #f9f9f7;
+            --surface: #ffffff;
+            --border: #e8e8e4;
+            --text-primary: #1a1a18;
+            --text-secondary: #767672;
+            --accent: #2d6a4f;
+            --accent-light: #e9f2ee;
+            --sidebar-bg: #ffffff;
+        }
+
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+
+        body {
+            font-family: 'DM Sans', sans-serif;
+            background: var(--bg);
+            color: var(--text-primary);
+            min-height: 100vh;
+        }
+
+        /* ── NAVBAR ── */
+        .top-navbar {
+            position: fixed;
+            top: 0; left: 0; right: 0;
+            height: var(--navbar-height);
+            background: var(--surface);
+            border-bottom: 1px solid var(--border);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 1.5rem 0 calc(var(--sidebar-width) + 1.5rem);
+            z-index: 1000;
+        }
+
+        .brand {
+            font-family: 'Playfair Display', serif;
+            font-size: 1.3rem;
+            color: var(--text-primary);
+            text-decoration: none;
+            letter-spacing: -0.02em;
+            position: fixed;
+            left: 1.5rem;
+            top: 0;
+            height: var(--navbar-height);
+            display: flex;
+            align-items: center;
+        }
+
+        .navbar-right {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .nav-icon-btn {
+            width: 36px; height: 36px;
+            border: none;
+            background: transparent;
+            border-radius: 8px;
+            display: flex; align-items: center; justify-content: center;
+            color: var(--text-secondary);
+            cursor: pointer;
+            transition: background 0.15s, color 0.15s;
+            text-decoration: none;
+            font-size: 1rem;
+            position: relative;
+        }
+
+        .nav-icon-btn:hover {
+            background: var(--accent-light);
+            color: var(--accent);
+        }
+
+        .badge-dot {
+            position: absolute;
+            top: 6px; right: 6px;
+            width: 7px; height: 7px;
+            background: var(--accent);
+            border-radius: 50%;
+            border: 1.5px solid white;
+        }
+
+        .nav-search {
+            display: flex;
+            align-items: center;
+            background: var(--bg);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            padding: 0 0.75rem;
+            gap: 0.5rem;
+            height: 36px;
+            transition: border-color 0.15s;
+        }
+
+        .nav-search:focus-within { border-color: var(--accent); }
+
+        .nav-search input {
+            border: none;
+            background: transparent;
+            outline: none;
+            font-family: 'DM Sans', sans-serif;
+            font-size: 0.85rem;
+            color: var(--text-primary);
+            width: 180px;
+        }
+
+        .nav-search input::placeholder { color: var(--text-secondary); }
+        .nav-search i { color: var(--text-secondary); font-size: 0.85rem; }
+
+        .sidebar-toggle {
+            display: none;
+            background: transparent;
+            border: none;
+            font-size: 1.2rem;
+            color: var(--text-secondary);
+            cursor: pointer;
+            margin-right: 0.5rem;
+        }
+
+        /* ── SIDEBAR ── */
+        .sidebar {
+            position: fixed;
+            top: 0; left: 0; bottom: 0;
+            width: var(--sidebar-width);
+            background: var(--sidebar-bg);
+            border-right: 1px solid var(--border);
+            padding-top: calc(var(--navbar-height) + 1.5rem);
+            overflow-y: auto;
+            z-index: 999;
+            transition: transform 0.3s ease;
+        }
+
+        .sidebar-section { padding: 0 1rem 1.5rem; }
+
+        .sidebar-section-label {
+            font-size: 0.68rem;
+            font-weight: 600;
+            letter-spacing: 0.1em;
+            text-transform: uppercase;
+            color: var(--text-secondary);
+            padding: 0 0.5rem;
+            margin-bottom: 0.4rem;
+        }
+
+        .sidebar-link {
+            display: flex;
+            align-items: center;
+            gap: 0.65rem;
+            padding: 0.55rem 0.75rem;
+            border-radius: 8px;
+            color: var(--text-secondary);
+            text-decoration: none;
+            font-size: 0.875rem;
+            font-weight: 400;
+            transition: background 0.15s, color 0.15s;
+        }
+
+        .sidebar-link i {
+            font-size: 1rem;
+            width: 20px;
+            text-align: center;
+            flex-shrink: 0;
+        }
+
+        .sidebar-link:hover {
+            background: var(--bg);
+            color: var(--text-primary);
+        }
+
+        .sidebar-link.active {
+            background: var(--accent-light);
+            color: var(--accent);
+            font-weight: 500;
+        }
+
+        .sidebar-link .badge {
+            margin-left: auto;
+            background: var(--accent-light);
+            color: var(--accent);
+            font-size: 0.7rem;
+            font-weight: 600;
+            padding: 1px 7px;
+            border-radius: 20px;
+        }
+
+        .sidebar-divider {
+            height: 1px;
+            background: var(--border);
+            margin: 0.5rem 1rem 1.5rem;
+        }
+
+        /* ── MAIN CONTENT ── */
+        .main-content {
+            margin-left: var(--sidebar-width);
+            margin-top: var(--navbar-height);
+            padding: 2rem;
+            min-height: calc(100vh - var(--navbar-height));
+        }
+
+        /* ── OVERLAY (mobile) ── */
+        .sidebar-overlay {
+            display: none;
+            position: fixed;
+            inset: 0;
+            background: rgba(0,0,0,0.3);
+            z-index: 998;
+        }
+
+        /* ── RESPONSIVE ── */
+        @media (max-width: 768px) {
+            .top-navbar { padding: 0 1rem; }
+            .brand { left: 3.5rem !important; }
+            .sidebar-toggle { display: flex !important; align-items: center; }
+            .sidebar { transform: translateX(-100%); }
+            .sidebar.open { transform: translateX(0); }
+            .sidebar-overlay.open { display: block; }
+            .main-content { margin-left: 0; }
+            .nav-search { display: none; }
+        }
+    </style>
+
+    {% block styles %}{% endblock %}
+</head>
+<body>
+
+<!-- ── TOP NAVBAR ── -->
+<nav class="top-navbar">
+    <div style="display:flex; align-items:center; gap:0.5rem;">
+        <button class="sidebar-toggle" id="sidebarToggle">
+            <i class="bi bi-list"></i>
+        </button>
+        <a class="brand" href="/">MonSite</a>
+    </div>
+
+    <div class="navbar-right">
+        <div class="nav-search">
+            <i class="bi bi-search"></i>
+            <input type="text" placeholder="Rechercher...">
+        </div>
+        <a href="#" class="nav-icon-btn" title="Notifications">
+            <i class="bi bi-bell"></i>
+            <span class="badge-dot"></span>
+        </a>
+        <a href="#" class="nav-icon-btn" title="Panier">
+            <i class="bi bi-bag"></i>
+        </a>
+        <a href="#" class="nav-icon-btn" title="Profil">
+            <i class="bi bi-person-circle"></i>
+        </a>
+    </div>
+</nav>
+
+<!-- ── SIDEBAR ── -->
+<aside class="sidebar" id="sidebar">
+
+    <div class="sidebar-section">
+        <p class="sidebar-section-label">Navigation</p>
+        <a href="/" class="sidebar-link">
+            <i class="bi bi-house"></i> Accueil
+        </a>
+        <a href="/miniprojet" class="sidebar-link">
+            <i class="bi bi-rocket"></i> Mini Projet
+        </a>
+        <a href="/miniprojet/inscription" class="sidebar-link">
+            <i class="bi bi-person-plus"></i> Devenir Donneur
+        </a>
+    </div>
+
+    <div class="sidebar-divider"></div>
+
+    <div class="sidebar-section">
+        <p class="sidebar-section-label">Boutique</p>
+        <a href="{% url 'index' %}" class="sidebar-link active">
+            <i class="bi bi-grid"></i> Catalogue
+        </a>
+        <a href="#" class="sidebar-link">
+            <i class="bi bi-tag"></i> Ajouter un produit
+            <span class="badge">Nouveau</span>
+        </a>
+        <a href="#" class="sidebar-link">
+            <i class="bi bi-star"></i> Favoris
+        </a>
+    </div>
+
+    <div class="sidebar-divider"></div>
+
+    <div class="sidebar-section">
+        <p class="sidebar-section-label">Gestion</p>
+        <a href="#" class="sidebar-link">
+            <i class="bi bi-box-seam"></i> Commandes
+            <span class="badge">3</span>
+        </a>
+        <a href="#" class="sidebar-link">
+            <i class="bi bi-people"></i> Clients
+        </a>
+        <a href="#" class="sidebar-link">
+            <i class="bi bi-bar-chart"></i> Statistiques
+        </a>
+    </div>
+
+    <div class="sidebar-divider"></div>
+
+    <div class="sidebar-section">
+        <p class="sidebar-section-label">Compte</p>
+        <a href="#" class="sidebar-link">
+            <i class="bi bi-gear"></i> Paramètres
+        </a>
+        <a href="#" class="sidebar-link">
+            <i class="bi bi-box-arrow-right"></i> Déconnexion
+        </a>
+    </div>
+
+</aside>
+
+<!-- Mobile overlay -->
+<div class="sidebar-overlay" id="sidebarOverlay"></div>
+
+<!-- ── PAGE CONTENT ── -->
+<main class="main-content">
+    {% block content %}{% endblock %}
+</main>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+<script>
+    const toggle = document.getElementById('sidebarToggle');
+    const sidebar = document.getElementById('sidebar');
+    const overlay = document.getElementById('sidebarOverlay');
+
+    toggle.addEventListener('click', () => {
+        sidebar.classList.toggle('open');
+        overlay.classList.toggle('open');
+    });
+
+    overlay.addEventListener('click', () => {
+        sidebar.classList.remove('open');
+        overlay.classList.remove('open');
+    });
+
+    // Lien actif automatique
+    document.querySelectorAll('.sidebar-link').forEach(link => {
+        if (link.href === window.location.href) {
+            document.querySelectorAll('.sidebar-link').forEach(l => l.classList.remove('active'));
+            link.classList.add('active');
+        }
+    });
+</script>
+
+{% block scripts %}{% endblock %}
+</body>
+</html>

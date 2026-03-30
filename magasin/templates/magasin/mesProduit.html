@@ -1,0 +1,36 @@
+{% extends 'magasin/base.html' %}
+{% block title %} Catalogue de produits {% endblock title %}
+{% block content %}
+
+<div class="container-fluid mt-3">
+<div class="row">
+
+<div id='products' class="col-lg-9 mx-auto">
+<div class="row mx-auto">
+
+{% for product in products %}
+<div id={{product.id}} style="width: 18rem; margin:15px; border:1px solid #ddd; border-radius:10px; padding:10px; text-align:center; box-shadow:0 4px 8px rgba(0,0,0,0.1);">
+    
+<a href="{% url 'detail_produit' product.id %}">
+    <img src="/media/{{product.image}}" 
+         width="200" 
+         height="200" 
+         class="card-img-top"
+         style="object-fit:cover; border-radius:8px;"
+         alt="{{product.libelle}}">
+</a>
+
+<div>
+<p style="font-weight:bold; margin-top:10px;">{{product.libelle}}</p>
+<p style="color:gray;"><b>{{product.description}}</b></p>
+</div>
+
+</div>
+{% endfor %}
+
+</div>
+</div>
+</div>
+</div>
+
+{% endblock %}

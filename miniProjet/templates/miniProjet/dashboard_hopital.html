@@ -1,0 +1,105 @@
+{% extends 'miniProjet/base.html' %}
+
+{% block content %}
+<div class="row mb-4">
+    <div class="col-12 d-flex justify-content-between align-items-center">
+        <h2 class="text-danger">Tableau de Bord Hôpital</h2>
+        <a href="{% url 'create_demande' %}" class="btn btn-primary">Publier une demande urgente</a>
+    </div>
+</div>
+
+<div class="card shadow-sm">
+    <div class="card-body">
+        <h4 class="card-title mb-4">Historique des demandes urgentes</h4>
+        
+        {% if demandes %}
+        <div class="table-responsive">
+            <table class="table table-hover align-middle">
+                <thead class="table-light">
+                    <tr>
+                        <th>Date et Délai</th>
+                        <th>Groupe Sanguin</th>
+                        <th>Quantité</th>
+                        <th>Statut</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for demande in demandes %}
+                    <tr>
+                        <td>
+                            <span class="d-block fw-bold">{{ demande.delai|date:"d M Y H:i" }}</span>
+                            <small class="text-muted text-truncate d-inline-block" style="max-width: 200px;">{{ demande.description }}</small>
+                        </td>
+                        <td><span class="badge bg-danger fs-6">{{ demande.groupe_sanguin }}</span></td>
+                        <td>{{ demande.quantite }} poches</td>
+                        <td>
+                            {% if demande.statut == 'Ouverte' %}
+                                <span class="badge bg-success">Ouverte</span>
+                            {% elif demande.statut == 'Clôturée' %}
+                                <span class="badge bg-secondary">Clôturée</span>
+                            {% else %}
+                                <span class="badge bg-warning text-dark">{{ demande.statut }}</span>
+                            {% endif %}
+                        </td>
+                        <td>
+                            <div class="btn-group btn-group-sm">
+                                <a href="{% url 'view_reponses_demande' demande.id %}" class="btn btn-outline-primary" title="Voir les réponses">Voir réponses</a>
+                                {% if demande.statut != 'Clôturée' %}
+                                    <a href="{% url 'edit_demande' demande.id %}" class="btn btn-outline-secondary" title="Modifier">Modifier</a>
+                                    <a href="{% url 'close_demande' demande.id %}" class="btn btn-outline-danger" title="Clôturer" onclick="return confirm('Êtes-vous sûr de vouloir clôturer cette demande ?');">Clôturer</a>
+                                {% endif %}
+                            </div>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        {% else %}
+            <p class="text-muted">Aucune demande urgente n'a été publiée.</p>
+        {% endif %}
+    </div>
+</div>
+
+<div class="row mt-5 mb-4">
+    <div class="col-12 d-flex justify-content-between align-items-center">
+        <h2 class="text-danger">Campagnes de Collecte</h2>
+        <a href="{% url 'create_campagne' %}" class="btn btn-primary">Créer une Campagne</a>
+    </div>
+</div>
+
+<div class="card shadow-sm mb-4">
+    <div class="card-body">
+        {% if campagnes %}
+        <div class="table-responsive">
+            <table class="table table-hover align-middle">
+                <thead class="table-light">
+                    <tr>
+                        <th>Nom et Lieu</th>
+                        <th>Date</th>
+                        <th>Cibles</th>
+                        <th>Capacité Totale</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for campagne in campagnes %}
+                    <tr>
+                        <td>
+                            <span class="d-block fw-bold">{{ campagne.nom }}</span>
+                            <small class="text-muted"><i class="bi bi-geo-alt"></i> {{ campagne.lieu }}</small>
+                        </td>
+                        <td>{{ campagne.date|date:"d M Y" }}</td>
+                        <td>{{ campagne.groupes_cibles }}</td>
+                        <td>{{ campagne.capacite_totale }} inscriptions max</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        {% else %}
+            <p class="text-muted">Aucune campagne de collecte créée.</p>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}

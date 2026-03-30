@@ -1,0 +1,27 @@
+{% extends 'miniProjet/base.html' %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-md-6">
+        <div class="card mt-5">
+            <div class="card-body p-4">
+                <h3 class="text-center mb-4 text-danger">Inscription Hôpital</h3>
+                <form method="post">
+                    {% csrf_token %}
+                    <h5 class="mb-3" style="font-weight: bold">Informations de connexion</h5>
+                    {{ user_form.as_p }}
+                    
+                    <h5 class="mb-3 mt-4" style="font-weight: bold">Informations de l'établissement</h5>
+                    {{ hopital_form.as_p }}
+                    
+                    <button type="submit" class="btn btn-primary w-100 mt-4 py-2">Demander une inscription</button>
+                    <small class="text-muted d-block text-center mt-2">Votre compte devra être validé par un administrateur.</small>
+                </form>
+                <div class="text-center mt-3">
+                    <a href="{% url 'connexion' %}">Déjà un compte ? Connectez-vous</a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

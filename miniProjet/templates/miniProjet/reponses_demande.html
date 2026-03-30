@@ -1,0 +1,60 @@
+{% extends 'miniProjet/base.html' %}
+
+{% block content %}
+<div class="row mb-4">
+    <div class="col-12 d-flex justify-content-between align-items-center">
+        <h2 class="text-danger">Réponses à la Demande Urgente</h2>
+        <a href="{% url 'dashboard_hopital' %}" class="btn btn-outline-secondary">Retour au tableau de bord</a>
+    </div>
+</div>
+
+<div class="row mb-4">
+    <div class="col-12">
+        <div class="card shadow-sm border-danger border-start border-3">
+            <div class="card-body">
+                <h5 class="card-title">Détails de la demande</h5>
+                <p class="mb-1"><strong>Groupe Sanguin :</strong> <span class="badge bg-danger fs-6">{{ demande.groupe_sanguin }}</span></p>
+                <p class="mb-1"><strong>Quantité requise :</strong> {{ demande.quantite }} poches</p>
+                <p class="mb-1"><strong>Délai :</strong> <span class="text-danger fw-bold">{{ demande.delai|date:"d M Y H:i" }}</span></p>
+                <p class="mb-0"><strong>Description :</strong> {{ demande.description }}</p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="card shadow-sm">
+    <div class="card-body">
+        <h4 class="card-title mb-4">Donneurs ayant répondu</h4>
+        {% if reponses %}
+        <div class="table-responsive">
+            <table class="table table-hover align-middle">
+                <thead class="table-light">
+                    <tr>
+                        <th>Date de Réponse</th>
+                        <th>Donneur</th>
+                        <th>Groupe Sanguin</th>
+                        <th>Ville</th>
+                        <th>Sexe</th>
+                        <th>Date de naissance</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for reponse in reponses %}
+                    <tr>
+                        <td>{{ reponse.date_reponse|date:"d M Y H:i" }}</td>
+                        <td><strong>{{ reponse.donneur.user.get_full_name }}</strong></td>
+                        <td><span class="badge bg-danger">{{ reponse.donneur.groupe_sanguin }}</span></td>
+                        <td>{{ reponse.donneur.ville }}</td>
+                        <td>{{ reponse.donneur.get_sexe_display }}</td>
+                        <td>{{ reponse.donneur.date_naissance|date:"d M Y" }}</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        {% else %}
+            <p class="text-muted">Aucun donneur n'a encore répondu à cette demande.</p>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}
