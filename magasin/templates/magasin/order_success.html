@@ -1,0 +1,25 @@
+{% extends 'magasin/base.html' %}
+
+{% block title %} Commande Confirmée {% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-lg-6">
+        <div class="card border-0 shadow-sm text-center" style="border-radius: 16px; background-color: var(--surface);">
+            <div class="card-body p-5">
+                <div class="mb-4">
+                    <i class="bi bi-check-circle-fill display-1" style="color: var(--accent);"></i>
+                </div>
+                <h2 class="mb-3" style="font-family: 'Playfair Display', serif;">Commande Confirmée !</h2>
+                <p class="text-secondary mb-4">
+                    Merci pour votre commande. Nous vous contacterons bientôt pour confirmer les détails de livraison.
+                </p>
+                <a href="{% url 'index' %}" class="btn px-4 py-2" style="background-color: var(--accent); color: white; border-radius: 12px;">
+                    <i class="bi bi-arrow-left me-2"></i> Continuer vos achats
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
+
+{% endblock %}

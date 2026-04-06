@@ -1,0 +1,161 @@
+{% extends 'magasin/base.html' %}
+
+{% block title %} Mon Panier {% endblock %}
+
+{% block content %}
+<div class="row mb-4 align-items-center">
+    <div class="col">
+        <h2 class="mb-0" style="font-family: 'Playfair Display', serif;">Mon Panier</h2>
+        <p class="text-secondary mb-0">Révise tes articles avant la commande</p>
+    </div>
+</div>
+
+<div class="row g-4">
+    <div class="col-lg-8">
+        <div class="card border-0 shadow-sm" style="border-radius: 16px; background-color: var(--surface);">
+            <div class="card-body p-0">
+                {% if cart %}
+                <div class="table-responsive">
+                    <table class="table table-hover mb-0 align-middle">
+                        <thead class="bg-light">
+                            <tr>
+                                <th scope="col" class="border-0 py-3 ps-4" style="border-radius: 16px 0 0 0;">Produit
+                                </th>
+                                <th scope="col" class="border-0 py-3">Prix Unitaire</th>
+                                <th scope="col" class="border-0 py-3 text-center">Quantité</th>
+                                <th scope="col" class="border-0 py-3 pe-4 text-end" style="border-radius: 0 16px 0 0;">
+                                    Total</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for key, item in cart.items %}
+                            <tr>
+                                <td class="ps-4 py-3">
+                                    <div class="d-flex align-items-center">
+                                        {% if item.image_url %}
+                                        <img src="{{ item.image_url }}" alt="{{ item.name }}" class="rounded me-3"
+                                            style="width: 60px; height: 60px; object-fit: cover;">
+                                        {% else %}
+                                        <div class="rounded me-3 bg-light d-flex align-items-center justify-content-center text-muted"
+                                            style="width: 60px; height: 60px;">
+                                            <i class="bi bi-image"></i>
+                                        </div>
+                                        {% endif %}
+                                        <span class="fw-medium">{{ item.name }}</span>
+                                    </div>
+                                </td>
+                                <td class="py-3 text-secondary">{{ item.price|floatformat:2 }} DT</td>
+                                <td class="py-3 text-center">
+                                    <form method="post" action="{% url 'update_cart' key %}" class="d-inline">
+                                        {% csrf_token %}
+                                        <div class="input-group input-group-sm" style="width: 120px;">
+                                            <button type="button" class="btn btn-outline-secondary btn-sm"
+                                                onclick="changeQuantity('{{ key }}', -1)">-</button>
+                                            <input type="number" name="quantity" value="{{ item.quantity }}" min="1"
+                                                class="form-control text-center" id="quantity-{{ key }}"
+                                                onchange="updateQuantity('{{ key }}')">
+                                            <button type="button" class="btn btn-outline-secondary btn-sm"
+                                                onclick="changeQuantity('{{ key }}', 1)">+</button>
+                                        </div>
+                                    </form>
+                                    <form method="post" action="{% url 'remove_from_cart' key %}" class="d-inline ms-2">
+                                        {% csrf_token %}
+                                        <button type="submit" class="btn btn-outline-danger btn-sm">
+                                            <i class="bi bi-trash"></i>
+                                        </button>
+                                    </form>
+                                </td>
+                                <td class="pe-4 py-3 text-end fw-bold" style="color: var(--accent);">
+                                    {{ item.row_total|floatformat:2 }} DT
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+                {% else %}
+                <div class="text-center py-5">
+                    <i class="bi bi-cart-x display-1 text-muted mb-3 d-block"></i>
+                    <h4 class="text-secondary mb-4">Votre panier est vide.</h4>
+                    <a href="{% url 'inde' %}" class="btn px-4 py-2"
+                        style="background-color: var(--accent); color: white; border-radius: 12px;">
+                        <i class="bi bi-arrow-left me-2"></i> Continuer vos achats
+                    </a>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+
+    <div class="col-lg-4">
+        <div class="card border-0 shadow-sm" style="border-radius: 16px; background-color: var(--surface);">
+            <div class="card-body p-4">
+                <h4 class="mb-4" style="font-family: 'Playfair Display', serif;">Résumé de la commande</h4>
+
+                <div class="d-flex justify-content-between mb-3 text-secondary">
+                    <span>Sous-total</span>
+                    <span>{{ total|floatformat:2 }} DT</span>
+                </div>
+
+                <div class="d-flex justify-content-between mb-3 text-secondary">
+                    <span>Frais de livraison</span>
+                    <span>Gratuit</span>
+                </div>
+
+                <hr>
+
+                <div class="d-flex justify-content-between mb-4 mt-3">
+                    <span class="fs-5 fw-bold">Total</span>
+                    <span class="fs-4 fw-bold" style="color: var(--accent);">{{ total|floatformat:2 }} DT</span>
+                </div>
+
+                <a href="{% url 'checkout' %}"
+                    class="btn w-100 py-3 mb-3 d-flex align-items-center justify-content-center"
+                    style="background-color: var(--accent); color: white; border-radius: 12px; font-weight: 600; {% if not cart %}pointer-events: none; opacity: 0.5;{% endif %}"
+                    onclick="return confirm('Êtes-vous sûr de vouloir valider la commande et procéder au paiement ?')">
+                    <i class="bi bi-check2-circle fs-5 me-2"></i> Valider la commande et Payer
+                </a>
+
+                <a href="{% url 'inde' %}"
+                    class="btn btn-light w-100 py-3 text-dark d-flex align-items-center justify-content-center"
+                    style="border-radius: 12px; border: 1px solid var(--border);">
+                    Continuer vos achats
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    function changeQuantity(productId, delta) {
+        const input = document.getElementById('quantity-' + productId);
+        let currentValue = parseInt(input.value);
+        let newValue = currentValue + delta;
+        if (newValue < 1) newValue = 1;
+        input.value = newValue;
+        updateQuantity(productId);
+    }
+
+    function updateQuantity(productId) {
+        const input = document.getElementById('quantity-' + productId);
+        const form = input.closest('form');
+        const formData = new FormData(form);
+
+        fetch(form.action, {
+            method: 'POST',
+            body: formData,
+            headers: {
+                'X-CSRFToken': document.querySelector('[name=csrfmiddlewaretoken]').value
+            }
+        })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    location.reload(); // Reload to update totals
+                }
+            })
+            .catch(error => console.error('Error:', error));
+    }
+</script>
+
+{% endblock %}

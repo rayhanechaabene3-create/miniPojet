@@ -1,0 +1,122 @@
+{% extends 'magasin/base.html' %}
+
+{% block title %} Checkout {% endblock %}
+
+{% block content %}
+<div class="row mb-4 align-items-center">
+    <div class="col">
+        <h2 class="mb-0" style="font-family: 'Playfair Display', serif;">Checkout</h2>
+        <p class="text-secondary mb-0">Finalisez votre commande</p>
+    </div>
+</div>
+
+<div class="row g-4">
+    <div class="col-lg-8">
+        <div class="card border-0 shadow-sm" style="border-radius: 16px; background-color: var(--surface);">
+            <div class="card-body p-0">
+                {% if cart %}
+                <div class="table-responsive">
+                    <table class="table table-hover mb-0 align-middle">
+                        <thead class="bg-light">
+                            <tr>
+                                <th scope="col" class="border-0 py-3 ps-4" style="border-radius: 16px 0 0 0;">Produit</th>
+                                <th scope="col" class="border-0 py-3">Prix Unitaire</th>
+                                <th scope="col" class="border-0 py-3 text-center">Quantité</th>
+                                <th scope="col" class="border-0 py-3 pe-4 text-end" style="border-radius: 0 16px 0 0;">Total</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for key, item in cart.items %}
+                            <tr>
+                                <td class="ps-4 py-3">
+                                    <div class="d-flex align-items-center">
+                                        {% if item.image_url %}
+                                        <img src="{{ item.image_url }}" alt="{{ item.name }}" class="rounded me-3" style="width: 60px; height: 60px; object-fit: cover;">
+                                        {% else %}
+                                        <div class="rounded me-3 bg-light d-flex align-items-center justify-content-center text-muted" style="width: 60px; height: 60px;">
+                                            <i class="bi bi-image"></i>
+                                        </div>
+                                        {% endif %}
+                                        <span class="fw-medium">{{ item.name }}</span>
+                                    </div>
+                                </td>
+                                <td class="py-3 text-secondary">{{ item.price }} DT</td>
+                                <td class="py-3 text-center">{{ item.quantity }}</td>
+                                <td class="pe-4 py-3 text-end fw-bold" style="color: var(--accent);">
+                                    {{ item.row_total|default:"0.00" }} DT
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+                {% else %}
+                <div class="text-center py-5">
+                    <i class="bi bi-cart-x display-1 text-muted mb-3 d-block"></i>
+                    <h4 class="text-secondary mb-4">Votre panier est vide.</h4>
+                    <a href="{% url 'index' %}" class="btn px-4 py-2" style="background-color: var(--accent); color: white; border-radius: 12px;">
+                        <i class="bi bi-arrow-left me-2"></i> Continuer vos achats
+                    </a>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-lg-4">
+        <div class="card border-0 shadow-sm" style="border-radius: 16px; background-color: var(--surface);">
+            <div class="card-body p-4">
+                <h4 class="mb-4" style="font-family: 'Playfair Display', serif;">Informations de livraison</h4>
+                
+                <form method="post" action="{% url 'checkout' %}">
+                    {% csrf_token %}
+                    <div class="mb-3">
+                        <label for="nom" class="form-label">Nom complet</label>
+                        <input type="text" class="form-control" id="nom" name="nom" required>
+                    </div>
+                    <div class="mb-3">
+                        <label for="email" class="form-label">Email</label>
+                        <input type="email" class="form-control" id="email" name="email" required>
+                    </div>
+                    <div class="mb-3">
+                        <label for="telephone" class="form-label">Téléphone</label>
+                        <input type="tel" class="form-control" id="telephone" name="telephone" required>
+                    </div>
+                    <div class="mb-3">
+                        <label for="adresse" class="form-label">Adresse</label>
+                        <textarea class="form-control" id="adresse" name="adresse" rows="3" required></textarea>
+                    </div>
+                    
+                    <hr>
+                    
+                    <div class="d-flex justify-content-between mb-3 text-secondary">
+                        <span>Sous-total</span>
+                        <span>{{ total }} DT</span>
+                    </div>
+                    
+                    <div class="d-flex justify-content-between mb-3 text-secondary">
+                        <span>Frais de livraison</span>
+                        <span>Gratuit</span>
+                    </div>
+                    
+                    <hr>
+                    
+                    <div class="d-flex justify-content-between mb-4 mt-3">
+                        <span class="fs-5 fw-bold">Total</span>
+                        <span class="fs-4 fw-bold" style="color: var(--accent);">{{ total }} DT</span>
+                    </div>
+                    
+                    <button type="submit" class="btn w-100 py-3 mb-3 d-flex align-items-center justify-content-center" style="background-color: var(--accent); color: white; border-radius: 12px; font-weight: 600;" {% if not cart %}disabled{% endif %}>
+                        <i class="bi bi-credit-card fs-5 me-2"></i> Confirmer la commande
+                    </button>
+                </form>
+                
+                <a href="{% url 'panier' %}" class="btn btn-light w-100 py-3 text-dark d-flex align-items-center justify-content-center" style="border-radius: 12px; border: 1px solid var(--border);">
+                    <i class="bi bi-arrow-left me-2"></i> Retour au panier
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
+
+{% endblock %}

@@ -14,22 +14,22 @@ class Category(models.Model):
            
   name=models.CharField(max_length=50,default='Al',choices=TYPE_CHOICES)
   def __str__(self):
-     return f"category : {self.name},  {self.TYPE_CHOICES} "
+     return f"Category: {self.get_name_display()}"
    
 
 class Produit(models.Model):
     libelle = models.CharField(max_length=100)
     description = models.TextField(default='')
-    prix= models.DecimalField(max_digits=10,decimal_places=3)
-    TYPE_CHOICES=[ ('em','emballe'),
-                 ('fr','Frais'),
-                 ('cs','Conserve')
-                 ]
-    
-         
-    type= models.CharField(max_length=100)
-    categorie=models.ForeignKey(Category,on_delete=models.CASCADE,null=True)
-    Fournisseur=models.ForeignKey('Fournisseur',on_delete=models.CASCADE,null=True)
+    prix = models.DecimalField(max_digits=10,decimal_places=3)
+    TYPE_CHOICES = [
+        ('em', 'emballe'),
+        ('fr', 'Frais'),
+        ('cs', 'Conserve')
+    ]
+
+    type = models.CharField(max_length=100, choices=TYPE_CHOICES, default='em')
+    categorie = models.ForeignKey(Category, on_delete=models.CASCADE, null=True)
+    Fournisseur = models.ForeignKey('Fournisseur', on_delete=models.CASCADE, null=True)
     image = models.ImageField(upload_to='images/', null=True, blank=True)
     
     
