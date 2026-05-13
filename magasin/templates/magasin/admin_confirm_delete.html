@@ -1,0 +1,55 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Supprimer {{ product.libelle }} — Admin</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700&family=Playfair+Display:wght@700&display=swap" rel="stylesheet">
+    <style>
+        body { font-family: 'Outfit', sans-serif; background: linear-gradient(135deg, #fdfbfb 0%, #ebedee 100%); min-height: 100vh; }
+        .admin-navbar { background: rgba(255,255,255,0.85); backdrop-filter: blur(20px); border-bottom: 1px solid rgba(0,0,0,0.06); padding: 0 2rem; height: 68px; display: flex; align-items: center; justify-content: space-between; position: sticky; top: 0; z-index: 100; }
+        .brand { font-family: 'Playfair Display', serif; font-size: 1.6rem; font-weight: 700; color: #000; text-decoration: none; }
+        .brand span { color: #c9a265; }
+        .card { border: none; border-radius: 20px; box-shadow: 0 4px 20px rgba(0,0,0,0.05); }
+    </style>
+</head>
+<body>
+<nav class="admin-navbar">
+    <a href="{% url 'admin_dashboard' %}" class="brand">Magasin<span>.</span> <small class="fs-6 text-muted fw-400">Admin</small></a>
+    <a href="{% url 'deconnexion_magasin' %}" class="btn btn-danger rounded-pill px-4">
+        <i class="bi bi-box-arrow-left me-2"></i>Déconnexion
+    </a>
+</nav>
+
+<div class="container py-4" style="max-width:500px;">
+    <div class="d-flex align-items-center gap-3 mb-4">
+        <a href="{% url 'admin_dashboard' %}" class="btn btn-light rounded-pill border"><i class="bi bi-arrow-left"></i></a>
+        <h4 class="mb-0" style="font-family:'Playfair Display',serif;">Supprimer un produit</h4>
+    </div>
+    <div class="card p-4">
+        <div class="d-flex align-items-center gap-3 mb-4">
+            {% if product.image %}
+            <img src="{{ product.image.url }}" style="width:64px;height:64px;object-fit:cover;border-radius:14px;">
+            {% endif %}
+            <div>
+                <p class="fw-600 mb-0 fs-5">{{ product.libelle }}</p>
+                <p class="text-muted mb-0">{{ product.prix }} DT</p>
+            </div>
+        </div>
+        <div class="alert alert-danger border-0 rounded-3">
+            <i class="bi bi-exclamation-triangle-fill me-2"></i>
+            Cette action est irréversible. Le produit sera définitivement supprimé.
+        </div>
+        <form method="post" class="d-flex gap-2 mt-3">
+            {% csrf_token %}
+            <button type="submit" class="btn btn-danger rounded-pill px-4"><i class="bi bi-trash me-1"></i>Confirmer</button>
+            <a href="{% url 'admin_dashboard' %}" class="btn btn-light border rounded-pill px-4">Annuler</a>
+        </form>
+    </div>
+</div>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

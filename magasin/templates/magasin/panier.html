@@ -110,10 +110,10 @@
                 </div>
 
                 <a href="{% url 'checkout' %}"
-                    class="btn w-100 py-3 mb-3 d-flex align-items-center justify-content-center"
-                    style="background-color: var(--accent); color: white; border-radius: 12px; font-weight: 600; {% if not cart %}pointer-events: none; opacity: 0.5;{% endif %}"
-                    onclick="return confirm('Êtes-vous sûr de vouloir valider la commande et procéder au paiement ?')">
-                    <i class="bi bi-check2-circle fs-5 me-2"></i> Valider la commande et Payer
+                    class="btn btn-dark w-100 py-3 mb-3 d-flex align-items-center justify-content-center rounded-pill"
+                    style="font-weight: 600; {% if not cart %}pointer-events: none; opacity: 0.5;{% endif %}"
+                    onclick="return confirm('Confirmer votre panier et procéder à la livraison ?')">
+                    <i class="bi bi-bag-check-fill fs-5 me-2"></i> Confirmer le panier
                 </a>
 
                 <a href="{% url 'inde' %}"

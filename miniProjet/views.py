@@ -7,7 +7,7 @@ from django.db.models import Count
 from django.http import HttpResponse
 import csv
 from .forms import UserForm, DonneurRegistrationForm, HopitalRegistrationForm, DonneurProfileForm, DemandeUrgenteForm, CampagneForm, InscriptionForm
-from .models import Donneur, Hopital, DemandeUrgente, Don, Campagne, ReponseAppel, Inscription
+from .models import Donneur, Hopital, DemandeUrgente, Don, Campagne, ReponseAppel, Inscription, Notification, Analyse
 
 def index(request):
     return render(request, 'miniProjet/index.html')
@@ -62,13 +62,13 @@ def connexion(request):
             if hasattr(user, 'hopital'):
                 if not user.hopital.valide:
                     logout(request)
-                    messages.error(request, 'Votre compte hôpital n\'est pas encore validé par l\'administrateur.')
-                    return redirect('connexion')
+                    messages.error(request, "Votre compte hôpital n'est pas encore validé par l'administrateur.")
+                    return render(request, 'miniProjet/connexion.html')
                 return redirect('dashboard_hopital')
             return redirect('index')
         else:
             messages.error(request, 'Login ou mot de passe incorrect.')
-            return redirect('connexion')
+            return render(request, 'miniProjet/connexion.html')
     return render(request, 'miniProjet/connexion.html')
 
 def deconnexion(request):
@@ -201,11 +201,82 @@ def close_demande(request, demande_id):
     return redirect('index')
 
 @login_required
+def envoyer_analyse(request, notification_id):
+    if not hasattr(request.user, 'donneur'):
+        return redirect('index')
+    notif = get_object_or_404(Notification, id=notification_id, destinataire=request.user)
+    analyse_existante = Analyse.objects.filter(donneur=request.user.donneur, notification=notif).first()
+    if request.method == 'POST':
+        fichier = request.FILES.get('fichier')
+        commentaire = request.POST.get('commentaire', '').strip()
+        if fichier and notif.expediteur:
+            if analyse_existante:
+                analyse_existante.fichier = fichier
+                analyse_existante.commentaire = commentaire
+                analyse_existante.save()
+            else:
+                Analyse.objects.create(
+                    donneur=request.user.donneur,
+                    hopital=notif.expediteur,
+                    notification=notif,
+                    fichier=fichier,
+                    commentaire=commentaire,
+                )
+            messages.success(request, "Vos analyses ont été envoyées à l'hôpital avec succès.")
+            return redirect('dashboard_donneur')
+        else:
+            messages.error(request, 'Veuillez sélectionner un fichier.')
+    return render(request, 'miniProjet/envoyer_analyse.html', {
+        'notification': notif,
+        'analyse_existante': analyse_existante,
+    })
+
+@login_required
 def view_reponses_demande(request, demande_id):
     if hasattr(request.user, 'hopital'):
         demande = get_object_or_404(DemandeUrgente, id=demande_id, hopital=request.user.hopital)
-        reponses = ReponseAppel.objects.filter(demande_urgente=demande).order_by('-date_reponse')
+        reponses = ReponseAppel.objects.filter(demande_urgente=demande).select_related('donneur__user', 'donneur').order_by('-date_reponse')
+        donneur_ids = [r.donneur_id for r in reponses]
+        analyses_map = {a.donneur_id: a for a in Analyse.objects.filter(donneur_id__in=donneur_ids)}
+        for reponse in reponses:
+            reponse.analyse = analyses_map.get(reponse.donneur_id)
         return render(request, 'miniProjet/reponses_demande.html', {'demande': demande, 'reponses': reponses})
+    return redirect('index')
+
+@login_required
+def decider_analyse(request, analyse_id, decision):
+    if hasattr(request.user, 'hopital') and request.method == 'POST':
+        analyse = get_object_or_404(Analyse, id=analyse_id)
+        demande_id = int(request.POST.get('demande_id', 0))
+        if decision == 'accepter':
+            analyse.statut = 'acceptee'
+            msg = f"Bonne nouvelle ! L'hôpital {request.user.hopital.nom} a accepté vos analyses. Vous êtes confirmé comme donneur pour cette demande."
+        else:
+            analyse.statut = 'refusee'
+            msg = f"L'hôpital {request.user.hopital.nom} a refusé vos analyses. Veuillez contacter l'hôpital pour plus d'informations."
+        analyse.save()
+        Notification.objects.create(
+            destinataire=analyse.donneur.user,
+            expediteur=request.user.hopital,
+            message=msg
+        )
+        messages.success(request, f"Analyse {'acceptée' if decision == 'accepter' else 'refusée'} avec succès. Le donneur a été notifié.")
+        return redirect('view_reponses_demande', demande_id=demande_id)
+    return redirect('index')
+
+@login_required
+def envoyer_notification(request, reponse_id):
+    if hasattr(request.user, 'hopital') and request.method == 'POST':
+        reponse = get_object_or_404(ReponseAppel, id=reponse_id, demande_urgente__hopital=request.user.hopital)
+        hopital_nom = request.user.hopital.nom
+        groupe = reponse.demande_urgente.groupe_sanguin
+        Notification.objects.create(
+            destinataire=reponse.donneur.user,
+            expediteur=request.user.hopital,
+            message=f"L'hôpital {hopital_nom} vous demande d'effectuer des analyses médicales pour confirmer votre don de sang ({groupe}). Veuillez vous présenter à l'hôpital muni de votre carte d'identité."
+        )
+        messages.success(request, f"Notification envoyée à {reponse.donneur.user.get_full_name() or reponse.donneur.user.username}.")
+        return redirect('view_reponses_demande', demande_id=reponse.demande_urgente.id)
     return redirect('index')
 
 from datetime import timedelta
@@ -258,7 +329,8 @@ def dashboard_donneur(request):
         groupes_compatibles = get_compatibilite(donneur.groupe_sanguin)
         demandes_compatibles = DemandeUrgente.objects.filter(
             statut='Ouverte',
-            groupe_sanguin__in=groupes_compatibles
+            groupe_sanguin__in=groupes_compatibles,
+            delai__gte=timezone.now()
         ).order_by('-delai')
 
         # Mes réponses pour indiquer déjà répondu
@@ -270,6 +342,12 @@ def dashboard_donneur(request):
             campagne__date__gte=timezone.now().date()
         ).select_related('campagne').order_by('campagne__date', 'creneau_horaire')
         
+        notifications = Notification.objects.filter(destinataire=request.user).order_by('-date')
+        Notification.objects.filter(destinataire=request.user, lu=False).update(lu=True)
+        analyses_map = {a.notification_id: a for a in Analyse.objects.filter(donneur=donneur)}
+        for notif in notifications:
+            notif.analyse = analyses_map.get(notif.id)
+
         return render(request, 'miniProjet/dashboard_donneur.html', {
             'donneur': donneur,
             'dons': dons,
@@ -277,7 +355,8 @@ def dashboard_donneur(request):
             'demandes_compatibles': demandes_compatibles,
             'mes_reponses': mes_reponses,
             'inscriptions': inscriptions,
-            'maintenant': timezone.now()
+            'maintenant': timezone.now(),
+            'notifications': notifications,
         })
     return redirect('index')
 

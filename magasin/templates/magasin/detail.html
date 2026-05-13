@@ -22,7 +22,7 @@
     <div class="col-md-6 mb-4 d-flex flex-column justify-content-center px-lg-5">
         <span class="badge mb-3 align-self-start"
             style="background-color: var(--accent-light); color: var(--accent); font-size: 0.9rem; padding: 0.5rem 1rem; border-radius: 20px;">
-            {% if produit.categorie %}{{ produit.categorie.get_name_display }}{% else %}Général{% endif %}
+            {% if produit.categorie %}{{ produit.categorie.name }}{% else %}Général{% endif %}
         </span>
 
         <h1 class="display-5 fw-bold mb-3" style="font-family: 'Playfair Display', serif;">{{produit.libelle}}</h1>

@@ -25,10 +25,13 @@ urlpatterns = [
     path('hopital/demandes/<int:demande_id>/modifier/', views.edit_demande, name='edit_demande'),
     path('hopital/demandes/<int:demande_id>/cloturer/', views.close_demande, name='close_demande'),
     path('hopital/demandes/<int:demande_id>/reponses/', views.view_reponses_demande, name='view_reponses_demande'),
+    path('hopital/reponses/<int:reponse_id>/notifier/', views.envoyer_notification, name='envoyer_notification'),
+    path('hopital/analyses/<int:analyse_id>/<str:decision>/', views.decider_analyse, name='decider_analyse'),
     path('hopital/campagnes/creer/', views.create_campagne, name='create_campagne'),
 
     # Donor Space
     path('dashboard/donneur/', views.dashboard_donneur, name='dashboard_donneur'),
     path('donneur/demandes/<int:demande_id>/repondre/', views.repondre_demande, name='repondre_demande'),
     path('donneur/don/enregistrer/', views.enregistrer_don, name='enregistrer_don'),
+    path('donneur/analyse/envoyer/<int:notification_id>/', views.envoyer_analyse, name='envoyer_analyse'),
 ]

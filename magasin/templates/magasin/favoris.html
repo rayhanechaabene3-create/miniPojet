@@ -1,0 +1,53 @@
+{% extends 'magasin/base.html' %}
+
+{% block title %}Mes Favoris{% endblock %}
+
+{% block content %}
+<div class="d-flex align-items-center gap-3 mb-4">
+    <h3 class="fw-700 mb-0" style="font-family:'Playfair Display',serif;">Mes Favoris</h3>
+    <span class="badge bg-dark rounded-pill">{{ favoris|length }}</span>
+</div>
+
+{% if favoris %}
+<div class="row g-4">
+    {% for favori in favoris %}
+    {% with product=favori.produit %}
+    <div class="col-sm-6 col-md-4 col-xl-3">
+        <div class="product-card" style="background:rgba(255,255,255,0.6);backdrop-filter:blur(16px);border:1px solid rgba(255,255,255,0.5);border-radius:20px;overflow:hidden;transition:all 0.4s cubic-bezier(0.16,1,0.3,1);height:100%;display:flex;flex-direction:column;">
+            <a href="{% url 'detail_produit' product.id %}" style="display:block;text-decoration:none;">
+                <div style="position:relative;padding:1.5rem 1.5rem 0;height:200px;display:flex;align-items:center;justify-content:center;">
+                    {% if product.image %}
+                    <img src="/media/{{ product.image }}" alt="{{ product.libelle }}" style="width:100%;height:100%;object-fit:contain;filter:drop-shadow(0 10px 15px rgba(0,0,0,0.1));">
+                    {% else %}
+                    <div style="width:100px;height:100px;background:rgba(0,0,0,0.03);border-radius:50%;display:flex;align-items:center;justify-content:center;">
+                        <i class="bi bi-gem display-4 text-muted"></i>
+                    </div>
+                    {% endif %}
+                </div>
+            </a>
+            <div style="padding:1.5rem;flex-grow:1;display:flex;flex-direction:column;">
+                <small class="text-uppercase fw-700 mb-1" style="font-size:0.75rem;letter-spacing:0.1em;color:#c9a265;">{{ product.categorie.name|default:'Collection' }}</small>
+                <h5 class="fw-600 mb-1" style="font-size:1.1rem;">{{ product.libelle }}</h5>
+                <p class="text-muted mb-3" style="font-size:0.9rem;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;">{{ product.description }}</p>
+                <div class="d-flex align-items-center justify-content-between mt-auto">
+                    <span style="font-family:'Playfair Display',serif;font-size:1.3rem;font-weight:700;">{{ product.prix }} DT</span>
+                    <a href="{% url 'toggle_favori' product.id %}" class="btn btn-sm rounded-pill" style="background:#c9a265;color:white;border:none;" title="Retirer des favoris">
+                        <i class="bi bi-heart-fill me-1"></i> Retirer
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+    {% endwith %}
+    {% endfor %}
+</div>
+{% else %}
+<div class="text-center py-5">
+    <i class="bi bi-heart display-1 text-muted d-block mb-3" style="opacity:0.3;"></i>
+    <h4 style="font-family:'Playfair Display',serif;" class="text-muted">Aucun favori pour le moment.</h4>
+    <a href="{% url 'inde' %}" class="btn btn-dark rounded-pill px-4 mt-3">
+        <i class="bi bi-grid-1x2 me-2"></i>Découvrir le catalogue
+    </a>
+</div>
+{% endif %}
+{% endblock %}

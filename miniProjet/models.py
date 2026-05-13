@@ -63,3 +63,26 @@ class ReponseAppel(models.Model):
     donneur = models.ForeignKey(Donneur, on_delete=models.CASCADE)
     date_reponse = models.DateTimeField(auto_now_add=True)
     statut = models.CharField(max_length=50) # Ex: Accepté, Décliné
+
+class Notification(models.Model):
+    destinataire = models.ForeignKey(User, on_delete=models.CASCADE, related_name='notifications')
+    expediteur = models.ForeignKey(Hopital, on_delete=models.SET_NULL, null=True, blank=True, related_name='notifications_envoyees')
+    message = models.TextField()
+    date = models.DateTimeField(auto_now_add=True)
+    lu = models.BooleanField(default=False)
+
+    def __str__(self):
+        return f"Notification pour {self.destinataire.username} - {'Lu' if self.lu else 'Non lu'}"
+
+class Analyse(models.Model):
+    STATUT_CHOICES = [('en_attente', 'En attente'), ('acceptee', 'Acceptée'), ('refusee', 'Refusée')]
+    donneur = models.ForeignKey(Donneur, on_delete=models.CASCADE, related_name='analyses')
+    hopital = models.ForeignKey(Hopital, on_delete=models.CASCADE, related_name='analyses_recues')
+    notification = models.ForeignKey(Notification, on_delete=models.SET_NULL, null=True, blank=True, related_name='analyses')
+    fichier = models.FileField(upload_to='analyses/')
+    commentaire = models.TextField(blank=True)
+    date_envoi = models.DateTimeField(auto_now_add=True)
+    statut = models.CharField(max_length=20, choices=STATUT_CHOICES, default='en_attente')
+
+    def __str__(self):
+        return f"Analyse de {self.donneur} pour {self.hopital}"

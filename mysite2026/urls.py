@@ -26,7 +26,9 @@ urlpatterns = [
     path('admin/', admin.site.urls),
     path('magasin/', include('magasin.urls')),
     path('miniprojet/', include('miniProjet.urls')),
-    path('accueil/', accueil, name='accueil')
+    path('accueil/', accueil, name='accueil'),
+    path('api-auth/', include('rest_framework.urls')),
     
 ]+ static (settings.MEDIA_URL, document_root= settings.MEDIA_ROOT)
+
 

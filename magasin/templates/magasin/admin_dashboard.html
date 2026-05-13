@@ -1,0 +1,247 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin — Magasin</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&family=Playfair+Display:wght@700&display=swap" rel="stylesheet">
+    <style>
+        body { font-family: 'Outfit', sans-serif; background: linear-gradient(135deg, #fdfbfb 0%, #ebedee 100%); min-height: 100vh; }
+        .admin-navbar { background: rgba(255,255,255,0.85); backdrop-filter: blur(20px); border-bottom: 1px solid rgba(0,0,0,0.06); padding: 0 2rem; height: 68px; display: flex; align-items: center; justify-content: space-between; position: sticky; top: 0; z-index: 100; }
+        .brand { font-family: 'Playfair Display', serif; font-size: 1.6rem; font-weight: 700; color: #000; text-decoration: none; }
+        .brand span { color: #c9a265; }
+        .card { border: none; border-radius: 20px; box-shadow: 0 4px 20px rgba(0,0,0,0.05); }
+        .section-title { font-family: 'Playfair Display', serif; font-weight: 700; }
+        .table thead { background: rgba(0,0,0,0.03); }
+        .badge-cat { background: rgba(0,0,0,0.06); color: #333; border-radius: 50px; padding: 0.3rem 0.8rem; font-size: 0.8rem; }
+        
+        /* Dark mode */
+        body.dark { background: linear-gradient(135deg, #0f0f0f 0%, #1a1a2e 100%); color: #e0e0e0; }
+        body.dark .admin-navbar { background: rgba(20,20,30,0.85); border-color: rgba(255,255,255,0.08); }
+        body.dark .brand { color: #fff; }
+        body.dark .card { background: rgba(30,30,40,0.8); border: 1px solid rgba(255,255,255,0.08); }
+        body.dark .table { color: #e0e0e0; }
+        body.dark .table-hover tbody tr:hover { color: #fff; background-color: rgba(255,255,255,0.05); }
+        body.dark .table thead { background: rgba(255,255,255,0.05); color: #ccc; }
+        body.dark .text-muted { color: #aaa !important; }
+        body.dark .section-title { color: #fff; }
+        body.dark .btn-outline-dark { color: #fff; border-color: rgba(255,255,255,0.5); }
+        body.dark .btn-outline-dark:hover { background: rgba(255,255,255,0.1); color: #fff; }
+        body.dark .badge-cat { background: rgba(255,255,255,0.1); color: #ddd; }
+        body.dark .btn-dark { background: #c9a265; border-color: #c9a265; color: #fff; }
+    </style>
+</head>
+<body>
+
+<!-- Navbar -->
+<nav class="admin-navbar">
+    <div class="d-flex align-items-center gap-3">
+        <a href="{% url 'admin_dashboard' %}" class="brand">Magasin<span>.</span> <small class="fs-6 text-muted fw-400">Admin</small></a>
+    </div>
+    <div class="d-flex align-items-center gap-3">
+        <!-- Dark mode toggle -->
+        <button id="darkToggle" class="btn btn-light rounded-pill border py-1 px-2 me-2" title="Mode nuit / jour" onclick="toggleDark()" style="background: rgba(255,255,255,0.1);">
+            <i class="bi bi-moon-stars" id="darkIcon"></i>
+        </button>
+        <span class="text-muted" style="font-size:0.9rem;"><i class="bi bi-person-circle me-1"></i>{{ user.username }}</span>
+        <a href="{% url 'deconnexion_magasin' %}" class="btn btn-danger rounded-pill px-4">
+            <i class="bi bi-box-arrow-left me-2"></i>Déconnexion
+        </a>
+    </div>
+</nav>
+
+<div class="container-fluid px-4 py-4">
+
+    <!-- Produits -->
+    <div class="d-flex justify-content-between align-items-center mb-3">
+        <div>
+            <h4 class="section-title mb-0">Gestion des Produits</h4>
+            <small class="text-muted">{{ products|length }} produit{{ products|length|pluralize }}</small>
+        </div>
+        <a href="{% url 'admin_add_product' %}" class="btn btn-dark rounded-pill px-4">
+            <i class="bi bi-plus-lg me-2"></i>Ajouter un produit
+        </a>
+    </div>
+
+    <div class="card mb-5">
+        <div class="table-responsive">
+            <table class="table table-hover align-middle mb-0">
+                <thead>
+                    <tr>
+                        <th class="ps-4 py-3">Produit</th>
+                        <th>Catégorie</th>
+                        <th>Type</th>
+                        <th>Fournisseur</th>
+                        <th>Prix</th>
+                        <th class="text-end pe-4">Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for product in products %}
+                    <tr>
+                        <td class="ps-4">
+                            <div class="d-flex align-items-center gap-3">
+                                {% if product.image %}
+                                <img src="{{ product.image.url }}" style="width:48px;height:48px;object-fit:cover;border-radius:12px;">
+                                {% else %}
+                                <div style="width:48px;height:48px;border-radius:12px;background:#f0ece4;display:flex;align-items:center;justify-content:center;">
+                                    <i class="bi bi-box text-muted"></i>
+                                </div>
+                                {% endif %}
+                                <div>
+                                    <p class="mb-0 fw-600">{{ product.libelle }}</p>
+                                    <small class="text-muted">{{ product.description|truncatechars:40 }}</small>
+                                </div>
+                            </div>
+                        </td>
+                        <td>{{ product.categorie }}</td>
+                        <td><span class="badge-cat">{{ product.get_type_display }}</span></td>
+                        <td>{{ product.Fournisseur }}</td>
+                        <td class="fw-600">{{ product.prix }} DT
+                            {% if product.solde > 0 %}
+                            <span class="badge bg-danger ms-1">-{{ product.solde }}%</span><br>
+                            <small class="text-muted">{{ product.prix_final }} DT</small>
+                            {% endif %}
+                        </td>
+                        <td class="text-end pe-4">
+                            <a href="{% url 'admin_edit_product' product.id %}" class="btn btn-sm btn-outline-dark rounded-pill me-1">
+                                <i class="bi bi-pencil"></i> Modifier
+                            </a>
+                            <a href="{% url 'admin_delete_product' product.id %}" class="btn btn-sm btn-outline-danger rounded-pill">
+                                <i class="bi bi-trash"></i> Supprimer
+                            </a>
+                        </td>
+                    </tr>
+                    {% empty %}
+                    <tr>
+                        <td colspan="6" class="text-center text-muted py-5">
+                            <i class="bi bi-box-seam fs-1 d-block mb-2"></i>Aucun produit pour le moment.
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <!-- Catégories -->
+    <div class="d-flex justify-content-between align-items-center mb-3">
+        <div>
+            <h4 class="section-title mb-0">Catégories</h4>
+            <small class="text-muted">{{ categories|length }} catégorie{{ categories|length|pluralize }}</small>
+        </div>
+        <a href="{% url 'admin_add_category' %}" class="btn btn-dark rounded-pill px-4">
+            <i class="bi bi-plus-lg me-2"></i>Ajouter une catégorie
+        </a>
+    </div>
+
+    <div class="card mb-5">
+        <div class="table-responsive">
+            <table class="table table-hover align-middle mb-0">
+                <thead>
+                    <tr>
+                        <th class="ps-4 py-3">Nom</th>
+                        <th>Nb Produits</th>
+                        <th class="text-end pe-4">Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for category in categories %}
+                    <tr>
+                        <td class="ps-4 fw-600">{{ category.name }}</td>
+                        <td><span class="badge-cat">{{ category.produit_set.count }} produit{{ category.produit_set.count|pluralize }}</span></td>
+                        <td class="text-end pe-4">
+                            <a href="{% url 'admin_edit_category' category.id %}" class="btn btn-sm btn-outline-dark rounded-pill me-1">
+                                <i class="bi bi-pencil"></i> Modifier
+                            </a>
+                            <a href="{% url 'admin_delete_category' category.id %}" class="btn btn-sm btn-outline-danger rounded-pill">
+                                <i class="bi bi-trash"></i> Supprimer
+                            </a>
+                        </td>
+                    </tr>
+                    {% empty %}
+                    <tr>
+                        <td colspan="3" class="text-center text-muted py-5">
+                            <i class="bi bi-tags fs-1 d-block mb-2"></i>Aucune catégorie pour le moment.
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <!-- Commandes -->
+    <div class="d-flex justify-content-between align-items-center mb-3">
+        <div>
+            <h4 class="section-title mb-0">Commandes reçues</h4>
+            <small class="text-muted">{{ commandes|length }} commande{{ commandes|length|pluralize }}</small>
+        </div>
+    </div>
+
+    <div class="card mb-5">
+        <div class="table-responsive">
+            <table class="table table-hover align-middle mb-0">
+                <thead>
+                    <tr>
+                        <th class="ps-4 py-3">#</th>
+                        <th>Client</th>
+                        <th>Adresse</th>
+                        <th>Téléphone</th>
+                        <th>Date</th>
+                        <th>Articles</th>
+                        <th class="text-end pe-4">Total</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for commande in commandes %}
+                    <tr>
+                        <td class="ps-4 fw-600">#{{ commande.id }}</td>
+                        <td>
+                            <p class="mb-0 fw-600">{{ commande.nom }}</p>
+                            <small class="text-muted">{{ commande.client }} &bull; {{ commande.email }}</small>
+                        </td>
+                        <td><small>{{ commande.adresse }}</small></td>
+                        <td>{{ commande.telephone }}</td>
+                        <td>{{ commande.dateCde }}</td>
+                        <td>
+                            {% for item in commande.items.all %}
+                            <small class="d-block">{{ item.produit_nom }} &times; {{ item.quantite }}</small>
+                            {% endfor %}
+                        </td>
+                        <td class="text-end pe-4 fw-600">{{ commande.totalCde }} DT</td>
+                    </tr>
+                    {% empty %}
+                    <tr>
+                        <td colspan="7" class="text-center text-muted py-5">
+                            <i class="bi bi-inbox fs-1 d-block mb-2"></i>Aucune commande reçue pour le moment.
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+<script>
+    function toggleDark() {
+        const isDark = document.body.classList.toggle('dark');
+        localStorage.setItem('magasin_dark', isDark ? '1' : '0');
+        document.getElementById('darkIcon').className = isDark ? 'bi bi-sun' : 'bi bi-moon-stars';
+    }
+    (function() {
+        if (localStorage.getItem('magasin_dark') === '1') {
+            document.body.classList.add('dark');
+            const icon = document.getElementById('darkIcon');
+            if (icon) icon.className = 'bi bi-sun';
+        }
+    })();
+</script>
+</body>
+</html>

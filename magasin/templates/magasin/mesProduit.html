@@ -4,236 +4,58 @@
 
 {% block content %}
 <style>
-    .page-header {
-        margin-bottom: 3rem;
-    }
-    .page-title {
-        font-family: 'Playfair Display', serif;
-        font-size: 3rem;
-        font-weight: 700;
-        color: var(--brand-primary);
-        letter-spacing: -0.02em;
-    }
-
-    /* Category Pills */
-    .filter-pills {
-        display: flex;
-        flex-wrap: wrap;
-        gap: 0.75rem;
-        margin-bottom: 2rem;
-    }
-    .filter-pill {
-        padding: 0.6rem 1.5rem;
-        border-radius: 50px;
-        background: rgba(255, 255, 255, 0.6);
-        border: 1px solid rgba(255,255,255, 0.4);
-        color: var(--text-muted);
-        font-weight: 500;
-        text-decoration: none;
-        transition: var(--transition-smooth);
-        backdrop-filter: blur(10px);
-    }
-    .filter-pill:hover {
-        background: rgba(255, 255, 255, 0.9);
-        color: var(--brand-primary);
-        transform: translateY(-2px);
-        box-shadow: 0 4px 12px rgba(0,0,0,0.05);
-    }
-    .filter-pill.active {
-        background: var(--brand-primary);
-        color: #fff;
-        border-color: var(--brand-primary);
-        box-shadow: 0 8px 20px rgba(0,0,0,0.15);
-    }
-
-    /* Product Cards */
-    .product-card {
-        background: rgba(255, 255, 255, 0.6);
-        backdrop-filter: blur(16px);
-        -webkit-backdrop-filter: blur(16px);
-        border: 1px solid var(--glass-border);
-        border-radius: 20px;
-        overflow: hidden;
-        transition: var(--transition-smooth);
-        height: 100%;
-        display: flex;
-        flex-direction: column;
-        position: relative;
-    }
-    .product-card:hover {
-        transform: translateY(-8px);
-        box-shadow: var(--shadow-hover);
-        background: rgba(255, 255, 255, 0.9);
-    }
-
-    .product-img-wrapper {
-        position: relative;
-        overflow: hidden;
-        padding: 1.5rem;
-        padding-bottom: 0;
-        height: 240px;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-    }
-    .product-img {
-        width: 100%;
-        height: 100%;
-        object-fit: contain;
-        transition: transform 0.6s cubic-bezier(0.16, 1, 0.3, 1);
-        filter: drop-shadow(0 10px 15px rgba(0,0,0,0.1));
-    }
-    .product-card:hover .product-img {
-        transform: scale(1.08) rotate(-2deg);
-    }
-
-    .placeholder-img {
-        width: 120px;
-        height: 120px;
-        background: rgba(0,0,0,0.03);
-        border: 1px solid rgba(0,0,0,0.05);
-        border-radius: 50%;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        color: #cbd5e1;
-    }
-
-    .product-body {
-        padding: 1.5rem;
-        flex-grow: 1;
-        display: flex;
-        flex-direction: column;
-    }
-    
-    .product-category {
-        font-size: 0.75rem;
-        text-transform: uppercase;
-        letter-spacing: 0.1em;
-        color: var(--brand-accent);
-        font-weight: 700;
-        margin-bottom: 0.5rem;
-    }
-    .product-title {
-        font-size: 1.2rem;
-        font-weight: 600;
-        color: var(--brand-primary);
-        margin-bottom: 0.5rem;
-        line-height: 1.3;
-    }
-    .product-desc {
-        color: var(--text-muted);
-        font-size: 0.9rem;
-        display: -webkit-box;
-        -webkit-line-clamp: 2;
-        line-clamp: 2;
-        -webkit-box-orient: vertical;
-        overflow: hidden;
-        margin-bottom: 1.5rem;
-    }
-
-    .product-footer {
-        display: flex;
-        align-items: center;
-        justify-content: space-between;
-        margin-top: auto;
-    }
-    .product-price {
-        font-family: 'Playfair Display', serif;
-        font-size: 1.4rem;
-        font-weight: 700;
-        color: var(--brand-primary);
-    }
-    
-    .btn-add-cart {
-        width: 44px;
-        height: 44px;
-        border-radius: 50%;
-        background: var(--brand-primary);
-        color: #fff;
-        border: none;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        font-size: 1.2rem;
-        transition: var(--transition-smooth);
-        box-shadow: 0 4px 12px rgba(0,0,0,0.1);
-    }
-    .btn-add-cart:hover {
-        background: var(--brand-accent);
-        transform: scale(1.1);
-        box-shadow: 0 8px 16px rgba(201, 162, 101, 0.3);
-    }
-
-    /* Modal styling */
-    .modal-content {
-        background: rgba(255, 255, 255, 0.85);
-        backdrop-filter: blur(24px);
-        -webkit-backdrop-filter: blur(24px);
-        border: 1px solid var(--glass-border);
-        border-radius: 24px;
-        box-shadow: 0 20px 50px rgba(0,0,0,0.15);
-    }
-    .modal-header {
-        border-bottom: 1px solid rgba(0,0,0,0.05);
-        padding: 1.5rem 2rem;
-    }
-    .modal-title {
-        font-family: 'Playfair Display', serif;
-        font-weight: 700;
-    }
-    .modal-body {
-        padding: 2rem;
-    }
-    .modal-footer {
-        border-top: 1px solid rgba(0,0,0,0.05);
-        padding: 1.5rem 2rem;
-    }
-    .modern-input-group {
-        background: rgba(255, 255, 255, 0.5);
-        border-radius: 12px;
-        border: 1px solid rgba(0,0,0,0.05);
-        overflow: hidden;
-    }
-    .modern-input-group .btn {
-        border: none;
-        background: transparent;
-        font-weight: 600;
-        color: var(--text-main);
-    }
-    .modern-input-group .form-control {
-        border: none;
-        background: transparent;
-        font-weight: 600;
-        font-size: 1.1rem;
-    }
-    .modern-input-group .form-control:focus {
-        box-shadow: none;
-    }
+    .page-header { margin-bottom: 3rem; }
+    .page-title { font-family: 'Playfair Display', serif; font-size: 3rem; font-weight: 700; color: var(--brand-primary); letter-spacing: -0.02em; }
+    .filter-pills { display: flex; flex-wrap: wrap; gap: 0.75rem; margin-bottom: 2rem; }
+    .filter-pill { padding: 0.6rem 1.5rem; border-radius: 50px; background: rgba(255,255,255,0.6); border: 1px solid rgba(255,255,255,0.4); color: var(--text-muted); font-weight: 500; text-decoration: none; transition: var(--transition-smooth); backdrop-filter: blur(10px); }
+    .filter-pill:hover { background: rgba(255,255,255,0.9); color: var(--brand-primary); transform: translateY(-2px); box-shadow: 0 4px 12px rgba(0,0,0,0.05); }
+    .filter-pill.active { background: var(--brand-primary); color: #fff; border-color: var(--brand-primary); box-shadow: 0 8px 20px rgba(0,0,0,0.15); }
+    .product-card { background: rgba(255,255,255,0.6); backdrop-filter: blur(16px); -webkit-backdrop-filter: blur(16px); border: 1px solid var(--glass-border); border-radius: 20px; overflow: hidden; transition: var(--transition-smooth); height: 100%; display: flex; flex-direction: column; position: relative; }
+    .product-card:hover { transform: translateY(-8px); box-shadow: var(--shadow-hover); background: rgba(255,255,255,0.9); }
+    .product-img-wrapper { position: relative; overflow: hidden; padding: 1.5rem; padding-bottom: 0; height: 240px; display: flex; align-items: center; justify-content: center; }
+    .product-img { width: 100%; height: 100%; object-fit: contain; transition: transform 0.6s cubic-bezier(0.16,1,0.3,1); filter: drop-shadow(0 10px 15px rgba(0,0,0,0.1)); }
+    .product-card:hover .product-img { transform: scale(1.08) rotate(-2deg); }
+    .placeholder-img { width: 120px; height: 120px; background: rgba(0,0,0,0.03); border: 1px solid rgba(0,0,0,0.05); border-radius: 50%; display: flex; align-items: center; justify-content: center; color: #cbd5e1; }
+    .product-body { padding: 1.5rem; flex-grow: 1; display: flex; flex-direction: column; }
+    .product-category { font-size: 0.75rem; text-transform: uppercase; letter-spacing: 0.1em; color: var(--brand-accent); font-weight: 700; margin-bottom: 0.5rem; }
+    .product-title { font-size: 1.2rem; font-weight: 600; color: var(--brand-primary); margin-bottom: 0.5rem; line-height: 1.3; }
+    .product-desc { color: var(--text-muted); font-size: 0.9rem; display: -webkit-box; -webkit-line-clamp: 2; line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; margin-bottom: 1.5rem; }
+    .product-footer { display: flex; align-items: center; justify-content: space-between; margin-top: auto; }
+    .product-price { font-family: 'Playfair Display', serif; font-size: 1.4rem; font-weight: 700; color: var(--brand-primary); }
+    .btn-add-cart { width: 44px; height: 44px; border-radius: 50%; background: var(--brand-primary); color: #fff; border: none; display: flex; align-items: center; justify-content: center; font-size: 1.2rem; transition: var(--transition-smooth); box-shadow: 0 4px 12px rgba(0,0,0,0.1); text-decoration: none; }
+    .btn-add-cart:hover { background: var(--brand-accent); transform: scale(1.1); box-shadow: 0 8px 16px rgba(201,162,101,0.3); }
+    .modal-content { background: rgba(255,255,255,0.85); backdrop-filter: blur(24px); -webkit-backdrop-filter: blur(24px); border: 1px solid var(--glass-border); border-radius: 24px; box-shadow: 0 20px 50px rgba(0,0,0,0.15); }
+    .modal-header { border-bottom: 1px solid rgba(0,0,0,0.05); padding: 1.5rem 2rem; }
+    .modal-title { font-family: 'Playfair Display', serif; font-weight: 700; }
+    .modal-body { padding: 2rem; }
+    .modal-footer { border-top: 1px solid rgba(0,0,0,0.05); padding: 1.5rem 2rem; }
+    .modern-input-group { background: rgba(255,255,255,0.5); border-radius: 12px; border: 1px solid rgba(0,0,0,0.05); overflow: hidden; }
+    .modern-input-group .btn { border: none; background: transparent; font-weight: 600; color: var(--text-main); }
+    .modern-input-group .form-control { border: none; background: transparent; font-weight: 600; font-size: 1.1rem; }
+    .modern-input-group .form-control:focus { box-shadow: none; }
 </style>
 
 <div class="page-header">
     <h1 class="page-title">Notre Collection</h1>
-    <p class="text-secondary fs-5 mt-2" style="max-width: 600px;">Découvrez l'élégance et le raffinement dans chaque pièce.</p>
+    <p class="text-secondary fs-5 mt-2" style="max-width:600px;">Découvrez l'élégance et le raffinement dans chaque pièce.</p>
 </div>
 
 <div class="filter-pills">
     <a href="{% url 'inde' %}" class="filter-pill {% if not selected_category %}active{% endif %}">Tout</a>
     {% for category in categories %}
-        <a href="{% url 'category_products' category.id %}" class="filter-pill {% if selected_category and selected_category.id == category.id %}active{% endif %}">{{ category.get_name_display }}</a>
+        <a href="{% url 'category_products' category.id %}" class="filter-pill {% if selected_category and selected_category.id == category.id %}active{% endif %}">{{ category.name }}</a>
     {% endfor %}
 </div>
 
 {% if selected_category %}
     <div class="mb-5">
-        <h3 class="mb-1" style="font-family: 'Playfair Display', serif; font-size: 2rem;">{{ selected_category.get_name_display }}</h3>
+        <h3 class="mb-1" style="font-family:'Playfair Display',serif;font-size:2rem;">{{ selected_category.name }}</h3>
         <p class="text-secondary">{{ products|length }} merveille{% if products|length > 1 %}s{% endif %} trouvée{% if products|length > 1 %}s{% endif %}</p>
-        
         <div class="row g-4 mt-2">
             {% for product in products %}
                 <div class="col-sm-6 col-md-4 col-xl-3">
                     <div class="product-card">
-                        <a href="{% url 'detail_produit' product.id %}" style="display: block; text-decoration: none;">
+                        <a href="{% url 'detail_produit' product.id %}" style="display:block;text-decoration:none;">
                             <div class="product-img-wrapper">
                                 {% if product.image %}
                                     <img src="/media/{{product.image}}" class="product-img" alt="{{product.libelle}}">
@@ -243,14 +65,29 @@
                             </div>
                         </a>
                         <div class="product-body">
-                            <span class="product-category">{{ product.categorie.get_name_display|default:'Collection' }}</span>
+                            <span class="product-category">{{ product.categorie.name|default:'Collection' }}</span>
                             <h5 class="product-title">{{product.libelle}}</h5>
                             <p class="product-desc">{{product.description}}</p>
                             <div class="product-footer">
-                                <span class="product-price">{{product.prix}} DT</span>
-                                <button type="button" class="btn-add-cart" onclick="openShoppingModal({{product.id}}, '{{product.libelle|escapejs}}', {{product.prix|stringformat:'f'|slice:':-4'}}, '{% if product.image %}/media/{{product.image}}{% endif %}')">
-                                    <i class="bi bi-plus-lg"></i>
-                                </button>
+                                <span class="product-price">
+                                    {% if product.solde > 0 %}
+                                    <span style="text-decoration:line-through;font-size:1rem;color:var(--text-muted);">{{product.prix}} DT</span><br>
+                                    <span style="color:#e63946;">{{product.prix_final}} DT</span>
+                                    {% else %}
+                                    {{product.prix}} DT
+                                    {% endif %}
+                                </span>
+                                <div class="d-flex gap-2">
+                                    {% if product.solde > 0 %}
+                                    <span style="position:absolute;top:1rem;left:1rem;background:#e63946;color:white;font-size:0.75rem;font-weight:700;padding:0.25rem 0.6rem;border-radius:50px;">-{{ product.solde }}%</span>
+                                    {% endif %}
+                                    <a href="{% url 'toggle_favori' product.id %}" class="btn-add-cart" style="background:{% if product.id in favori_ids %}#c9a265{% else %}rgba(0,0,0,0.08){% endif %};" title="Favori">
+                                        <i class="bi bi-heart{% if product.id in favori_ids %}-fill{% endif %}" style="color:{% if product.id in favori_ids %}white{% else %}#555{% endif %};"></i>
+                                    </a>
+                                    <button type="button" class="btn-add-cart" onclick="openShoppingModal({{product.id}}, '{{product.libelle|escapejs}}', {{product.prix_final|stringformat:'f'|slice:':-4'}}, '{% if product.image %}/media/{{product.image}}{% endif %}')">
+                                        <i class="bi bi-plus-lg"></i>
+                                    </button>
+                                </div>
                             </div>
                         </div>
                     </div>
@@ -258,7 +95,7 @@
             {% empty %}
                 <div class="col-12 py-5 text-center">
                     <i class="bi bi-box2 display-1 text-black-50 mb-4 opacity-50"></i>
-                    <h4 class="text-muted" style="font-family: 'Playfair Display', serif;">Collection en cours de création.</h4>
+                    <h4 class="text-muted" style="font-family:'Playfair Display',serif;">Collection en cours de création.</h4>
                 </div>
             {% endfor %}
         </div>
@@ -266,14 +103,13 @@
 {% else %}
     {% for group in category_groups %}
         <div class="mb-5">
-            <h3 class="mt-4 mb-2" style="font-family: 'Playfair Display', serif; font-size: 2rem;">{{ group.category.get_name_display }}</h3>
+            <h3 class="mt-4 mb-2" style="font-family:'Playfair Display',serif;font-size:2rem;">{{ group.category.name }}</h3>
             <p class="text-secondary mb-4">{{ group.products|length }} création{% if group.products|length > 1 %}s{% endif %}</p>
-            
             <div class="row g-4">
                 {% for product in group.products %}
                     <div class="col-sm-6 col-md-4 col-xl-3">
                         <div class="product-card">
-                            <a href="{% url 'detail_produit' product.id %}" style="display: block; text-decoration: none;">
+                            <a href="{% url 'detail_produit' product.id %}" style="display:block;text-decoration:none;">
                                 <div class="product-img-wrapper">
                                     {% if product.image %}
                                         <img src="/media/{{product.image}}" class="product-img" alt="{{product.libelle}}">
@@ -283,14 +119,29 @@
                                 </div>
                             </a>
                             <div class="product-body">
-                                <span class="product-category">{{ product.categorie.get_name_display|default:'Collection' }}</span>
+                                <span class="product-category">{{ product.categorie.name|default:'Collection' }}</span>
                                 <h5 class="product-title">{{product.libelle}}</h5>
                                 <p class="product-desc">{{product.description}}</p>
                                 <div class="product-footer">
-                                    <span class="product-price">{{product.prix}} DT</span>
-                                    <button type="button" class="btn-add-cart" onclick="openShoppingModal({{product.id}}, '{{product.libelle|escapejs}}', {{product.prix|stringformat:'f'|slice:':-4'}}, '{% if product.image %}/media/{{product.image}}{% endif %}')">
-                                        <i class="bi bi-plus-lg"></i>
-                                    </button>
+                                    <span class="product-price">
+                                        {% if product.solde > 0 %}
+                                        <span style="text-decoration:line-through;font-size:1rem;color:var(--text-muted);">{{product.prix}} DT</span><br>
+                                        <span style="color:#e63946;">{{product.prix_final}} DT</span>
+                                        {% else %}
+                                        {{product.prix}} DT
+                                        {% endif %}
+                                    </span>
+                                    <div class="d-flex gap-2">
+                                        {% if product.solde > 0 %}
+                                        <span style="position:absolute;top:1rem;left:1rem;background:#e63946;color:white;font-size:0.75rem;font-weight:700;padding:0.25rem 0.6rem;border-radius:50px;">-{{ product.solde }}%</span>
+                                        {% endif %}
+                                        <a href="{% url 'toggle_favori' product.id %}" class="btn-add-cart" style="background:{% if product.id in favori_ids %}#c9a265{% else %}rgba(0,0,0,0.08){% endif %};" title="Favori">
+                                            <i class="bi bi-heart{% if product.id in favori_ids %}-fill{% endif %}" style="color:{% if product.id in favori_ids %}white{% else %}#555{% endif %};"></i>
+                                        </a>
+                                        <button type="button" class="btn-add-cart" onclick="openShoppingModal({{product.id}}, '{{product.libelle|escapejs}}', {{product.prix_final|stringformat:'f'|slice:':-4'}}, '{% if product.image %}/media/{{product.image}}{% endif %}')">
+                                            <i class="bi bi-plus-lg"></i>
+                                        </button>
+                                    </div>
                                 </div>
                             </div>
                         </div>
@@ -302,35 +153,34 @@
     {% if not category_groups %}
         <div class="col-12 text-center py-5">
             <i class="bi bi-door-closed display-1 text-black-50 mb-4 opacity-50"></i>
-            <h4 class="text-muted" style="font-family: 'Playfair Display', serif;">La boutique est momentanément vide.</h4>
+            <h4 class="text-muted" style="font-family:'Playfair Display',serif;">La boutique est momentanément vide.</h4>
         </div>
     {% endif %}
 {% endif %}
 
-<!-- Premium Shopping Modal -->
+<!-- Shopping Modal -->
 <div class="modal fade" id="shoppingModal" tabindex="-1" aria-hidden="true">
     <div class="modal-dialog modal-dialog-centered">
         <div class="modal-content">
             <div class="modal-header border-0 pb-0">
-                <h5 class="modal-title fs-4" id="shoppingModalLabel">Ajouter au Panier</h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                <h5 class="modal-title fs-4">Ajouter au Panier</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
             </div>
             <div class="modal-body">
                 <div class="d-flex gap-4 mb-4 align-items-center">
-                    <div id="productImageContainer" style="flex-shrink: 0;">
-                        <img id="modalProductImage" src="" alt="Produit" style="width: 100px; height: 100px; object-fit: contain; border-radius: 16px; background: rgba(0,0,0,0.03); padding: 0.5rem; border: 1px solid rgba(0,0,0,0.05);">
+                    <div id="productImageContainer" style="flex-shrink:0;">
+                        <img id="modalProductImage" src="" alt="Produit" style="width:100px;height:100px;object-fit:contain;border-radius:16px;background:rgba(0,0,0,0.03);padding:0.5rem;border:1px solid rgba(0,0,0,0.05);">
                     </div>
-                    <div style="flex: 1;">
-                        <span class="text-uppercase" style="font-size:0.7rem; letter-spacing:0.1em; color:var(--brand-accent); font-weight:700;">Sélection</span>
-                        <h6 id="modalProductName" class="fw-bold fs-5 mb-1 text-dark" style="font-family: 'Playfair Display', serif;"></h6>
+                    <div style="flex:1;">
+                        <span class="text-uppercase" style="font-size:0.7rem;letter-spacing:0.1em;color:var(--brand-accent);font-weight:700;">Sélection</span>
+                        <h6 id="modalProductName" class="fw-bold fs-5 mb-1 text-dark" style="font-family:'Playfair Display',serif;"></h6>
                         <p id="modalProductPrice" class="fs-5 fw-medium mb-0 text-muted"></p>
                     </div>
                 </div>
-                
                 <form id="shoppingForm" method="post">
                     {% csrf_token %}
                     <div class="mb-3">
-                        <label class="form-label text-muted fw-bold mb-3" style="font-size: 0.85rem; letter-spacing: 0.05em; text-transform: uppercase;">Quantité Désirée</label>
+                        <label class="form-label text-muted fw-bold mb-3" style="font-size:0.85rem;letter-spacing:0.05em;text-transform:uppercase;">Quantité Désirée</label>
                         <div class="input-group modern-input-group w-50">
                             <button type="button" class="btn btn-light px-3" onclick="decreaseQuantity()"><i class="bi bi-dash"></i></button>
                             <input type="number" id="quantity" name="quantity" class="form-control text-center bg-transparent py-2" value="1" min="1" max="99" readonly>
@@ -338,15 +188,15 @@
                         </div>
                         <div class="mt-4 pt-3 border-top d-flex justify-content-between align-items-center">
                             <span class="text-muted fw-bold">Total Estimé</span>
-                            <span class="fs-4 fw-bold" style="color: var(--brand-primary); font-family: 'Playfair Display', serif;"><span id="totalPrice">0</span> DT</span>
+                            <span class="fs-4 fw-bold" style="color:var(--brand-primary);font-family:'Playfair Display',serif;"><span id="totalPrice">0</span> DT</span>
                         </div>
                     </div>
                 </form>
             </div>
             <div class="modal-footer border-0 pt-0 d-flex gap-2">
-                <button type="button" class="btn border px-4" style="border-radius: 50px;" data-bs-dismiss="modal">Annuler</button>
-                <button type="submit" form="shoppingForm" class="btn flex-grow-1" style="border-radius: 50px; background-color: var(--brand-primary); color: white; font-weight: 500;" onclick="submitShoppingForm(event)">
-                    <i class="bi bi-bag-plus me-2"></i> Confirm
+                <button type="button" class="btn border px-4" style="border-radius:50px;" data-bs-dismiss="modal">Annuler</button>
+                <button type="submit" form="shoppingForm" class="btn flex-grow-1" style="border-radius:50px;background-color:var(--brand-primary);color:white;font-weight:500;" onclick="submitShoppingForm(event)">
+                    <i class="bi bi-bag-plus me-2"></i> Confirmer
                 </button>
             </div>
         </div>
@@ -359,62 +209,45 @@ let currentProductPrice = null;
 
 function openShoppingModal(productId, productName, productPrice, productImage) {
     currentProductId = productId;
-    // Format string might fail in js if it has comma, ensure it's a number
     currentProductPrice = parseFloat(('' + productPrice).replace(',', '.'));
     if (isNaN(currentProductPrice)) { currentProductPrice = 0; }
-    
     document.getElementById('modalProductName').textContent = productName;
     document.getElementById('modalProductPrice').textContent = currentProductPrice.toFixed(2) + ' DT';
     document.getElementById('quantity').value = 1;
-    
     if (productImage && productImage !== '') {
         document.getElementById('modalProductImage').src = productImage;
         document.getElementById('productImageContainer').style.display = 'block';
     } else {
         document.getElementById('productImageContainer').style.display = 'none';
     }
-    
     updateTotalPrice();
-    
-    const modal = new bootstrap.Modal(document.getElementById('shoppingModal'));
-    modal.show();
+    new bootstrap.Modal(document.getElementById('shoppingModal')).show();
 }
 
 function increaseQuantity() {
-    const quantityInput = document.getElementById('quantity');
-    quantityInput.value = parseInt(quantityInput.value) + 1;
+    const input = document.getElementById('quantity');
+    input.value = parseInt(input.value) + 1;
     updateTotalPrice();
 }
 
 function decreaseQuantity() {
-    const quantityInput = document.getElementById('quantity');
-    if (parseInt(quantityInput.value) > 1) {
-        quantityInput.value = parseInt(quantityInput.value) - 1;
-        updateTotalPrice();
-    }
+    const input = document.getElementById('quantity');
+    if (parseInt(input.value) > 1) { input.value = parseInt(input.value) - 1; updateTotalPrice(); }
 }
 
 function updateTotalPrice() {
     const quantity = parseInt(document.getElementById('quantity').value);
-    const total = (currentProductPrice * quantity).toFixed(2);
-    document.getElementById('totalPrice').textContent = total;
+    document.getElementById('totalPrice').textContent = (currentProductPrice * quantity).toFixed(2);
 }
 
 function submitShoppingForm(event) {
     event.preventDefault();
     const quantity = document.getElementById('quantity').value;
-    
     const form = document.createElement('form');
     form.method = 'POST';
     form.action = '/magasin/add_to_cart_with_quantity/' + currentProductId + '/';
-    
-    const csrfToken = document.querySelector('[name=csrfmiddlewaretoken]').value;
-    
-    form.innerHTML = `
-        <input type="hidden" name="csrfmiddlewaretoken" value="${csrfToken}">
-        <input type="hidden" name="quantity" value="${quantity}">
-    `;
-    
+    const csrf = document.querySelector('[name=csrfmiddlewaretoken]').value;
+    form.innerHTML = `<input type="hidden" name="csrfmiddlewaretoken" value="${csrf}"><input type="hidden" name="quantity" value="${quantity}">`;
     document.body.appendChild(form);
     form.submit();
 }

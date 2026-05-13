@@ -30,23 +30,74 @@
             <table class="table table-hover align-middle">
                 <thead class="table-light">
                     <tr>
-                        <th>Date de Réponse</th>
                         <th>Donneur</th>
-                        <th>Groupe Sanguin</th>
+                        <th>Groupe</th>
                         <th>Ville</th>
-                        <th>Sexe</th>
-                        <th>Date de naissance</th>
+                        <th>Date réponse</th>
+                        <th>Analyses reçues</th>
+                        <th>Notifier</th>
                     </tr>
                 </thead>
                 <tbody>
                     {% for reponse in reponses %}
                     <tr>
-                        <td>{{ reponse.date_reponse|date:"d M Y H:i" }}</td>
-                        <td><strong>{{ reponse.donneur.user.get_full_name }}</strong></td>
+                        <td><strong>{{ reponse.donneur.user.get_full_name|default:reponse.donneur.user.username }}</strong></td>
                         <td><span class="badge bg-danger">{{ reponse.donneur.groupe_sanguin }}</span></td>
                         <td>{{ reponse.donneur.ville }}</td>
-                        <td>{{ reponse.donneur.get_sexe_display }}</td>
-                        <td>{{ reponse.donneur.date_naissance|date:"d M Y" }}</td>
+                        <td>{{ reponse.date_reponse|date:"d M Y H:i" }}</td>
+
+                        <!-- Analyses column -->
+                        <td>
+                            {% if reponse.analyse %}
+                                <!-- File link -->
+                                <a href="/media/{{ reponse.analyse.fichier }}" target="_blank" class="btn btn-sm btn-outline-primary mb-2 d-block">
+                                    &#128196; Voir le fichier
+                                </a>
+                                {% if reponse.analyse.commentaire %}
+                                <small class="text-muted d-block mb-2">{{ reponse.analyse.commentaire }}</small>
+                                {% endif %}
+
+                                <!-- Decision -->
+                                {% if reponse.analyse.statut == 'en_attente' %}
+                                <div class="d-flex gap-1">
+                                    <form method="post" action="{% url 'decider_analyse' reponse.analyse.id 'accepter' %}">
+                                        {% csrf_token %}
+                                        <input type="hidden" name="demande_id" value="{{ demande.id }}">
+                                        <button type="submit" class="btn btn-success btn-sm"
+                                            onclick="return confirm('Accepter les analyses de ce donneur ? Une notification lui sera envoyée.')">
+                                            &#10003; Accepter
+                                        </button>
+                                    </form>
+                                    <form method="post" action="{% url 'decider_analyse' reponse.analyse.id 'refuser' %}">
+                                        {% csrf_token %}
+                                        <input type="hidden" name="demande_id" value="{{ demande.id }}">
+                                        <button type="submit" class="btn btn-danger btn-sm"
+                                            onclick="return confirm('Refuser les analyses de ce donneur ? Une notification lui sera envoyée.')">
+                                            &#10007; Refuser
+                                        </button>
+                                    </form>
+                                </div>
+                                {% elif reponse.analyse.statut == 'acceptee' %}
+                                <span class="badge bg-success fs-6">&#10003; Analyses acceptées</span>
+                                {% else %}
+                                <span class="badge bg-danger fs-6">&#10007; Analyses refusées</span>
+                                {% endif %}
+
+                            {% else %}
+                                <span class="badge bg-secondary">Non envoyées</span>
+                            {% endif %}
+                        </td>
+
+                        <!-- Notify column -->
+                        <td>
+                            <form method="post" action="{% url 'envoyer_notification' reponse.id %}">
+                                {% csrf_token %}
+                                <button type="submit" class="btn btn-sm btn-outline-danger"
+                                    onclick="return confirm('Envoyer une demande d\'analyses à ce donneur ?')">
+                                    &#128276; Notifier
+                                </button>
+                            </form>
+                        </td>
                     </tr>
                     {% endfor %}
                 </tbody>

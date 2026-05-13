@@ -88,6 +88,39 @@
 
     <!-- Colonne de droite : Demandes et Inscriptions -->
     <div class="col-md-8">
+
+        <!-- Notifications -->
+        {% if notifications %}
+        <div class="card shadow-sm mb-4 border-warning border-start border-3">
+            <div class="card-body">
+                <h4 class="card-title mb-3">&#128276; Notifications</h4>
+                {% for notif in notifications %}
+                <div class="mb-3 border rounded-3 p-3 {% if not notif.lu %}bg-warning bg-opacity-25{% else %}bg-light{% endif %}">
+                    <div class="d-flex justify-content-between align-items-start">
+                        <span><strong>{{ notif.message }}</strong></span>
+                        <small class="text-muted ms-3 text-nowrap">{{ notif.date|date:"d M Y H:i" }}</small>
+                    </div>
+                    <div class="mt-3">
+                        {% if notif.analyse %}
+                            {% if notif.analyse.statut == 'acceptee' %}
+                                <span class="badge bg-success fs-6">&#10003; Analyses acceptées</span>
+                            {% elif notif.analyse.statut == 'refusee' %}
+                                <span class="badge bg-danger fs-6">&#10007; Analyses refusées</span>
+                            {% else %}
+                                <span class="badge bg-warning text-dark">&#9203; Analyses envoyées — en attente de décision</span>
+                                <a href="{% url 'envoyer_analyse' notif.id %}" class="btn btn-sm btn-outline-danger ms-2">Mettre à jour</a>
+                            {% endif %}
+                        {% else %}
+                            <a href="{% url 'envoyer_analyse' notif.id %}" class="btn btn-danger btn-sm">
+                                &#128206; Envoyer mes analyses
+                            </a>
+                        {% endif %}
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+        {% endif %}
         
         <!-- Section Campagnes -->
         <div class="card shadow-sm mb-4">
@@ -114,9 +147,10 @@
 
         <div class="card shadow-sm">
             <div class="card-body">
-                <h4 class="card-title mb-4">Appels urgents compatibles avec votre groupe</h4>
+                <h4 class="card-title mb-4">Appels urgents compatibles avec votre groupe <span class="badge bg-danger">{{ donneur.groupe_sanguin }}</span></h4>
                 
                 {% if demandes_compatibles %}
+                    <p class="text-muted small mb-3">{{ demandes_compatibles|length }} demande{{ demandes_compatibles|length|pluralize }} trouvée{{ demandes_compatibles|length|pluralize }} pour votre groupe sanguin.</p>
                     {% for demande in demandes_compatibles %}
                         <div class="card mb-3 border-danger shadow-sm">
                             <div class="card-body">
@@ -151,4 +185,12 @@
         </div>
     </div>
 </div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+document.querySelectorAll('.btn-outline-secondary[data-annuler]').forEach(function(btn) {
+    btn.addEventListener('click', function(e) { e.stopPropagation(); });
+});
+</script>
 {% endblock %}
