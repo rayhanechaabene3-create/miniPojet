@@ -1,37 +1,38 @@
 from django.urls import path
-from . import views
-
+from . import views  # pyrefly: ignore [missing-import]
 
 urlpatterns = [
-    path('', views.index, name='index'),
-    path('inscription/', views.inscription, name='inscription'),
-    path('hopital_inscription/', views.hopital_inscription, name='hopital_inscription'),
-    path('connexion/', views.connexion, name='connexion'),
-    path('deconnexion/', views.deconnexion, name='deconnexion'),
+    path('', views.IndexView.as_view(), name='index'),
+    path('inscription/', views.DonneurInscriptionView.as_view(), name='inscription'),
+    path('hopital_inscription/', views.HopitalInscriptionView.as_view(), name='hopital_inscription'),
+    path('connexion/', views.CustomLoginView.as_view(), name='connexion'),
+    path('deconnexion/', views.CustomLogoutView.as_view(), name='deconnexion'),
     
-    path('profil/modifier/', views.edit_profile, name='edit_profile'),
-    path('profil/supprimer/', views.delete_account, name='delete_account'),
-    path('donneur/toggle_activation/', views.toggle_activation_donneur, name='toggle_activation_donneur'),
+    path('profil/modifier/', views.EditProfileView.as_view(), name='edit_profile'),
+    path('profil/supprimer/', views.AccountDeleteView.as_view(), name='delete_account'),
+    path('donneur/toggle_activation/', views.ToggleActivationDonneurView.as_view(), name='toggle_activation_donneur'),
     
-    path('dashboard/admin/', views.dashboard_admin, name='dashboard_admin'),
-    path('dashboard/admin/valider_hopital/<int:hopital_id>/', views.valider_hopital, name='valider_hopital'),
-    path('dashboard/admin/export_donneurs/', views.export_donneurs_csv, name='export_donneurs_csv'),
-    path('campagnes/', views.list_campagnes, name='list_campagnes'),
-    path('campagnes/<int:campagne_id>/inscrire/', views.inscrire_campagne, name='inscrire_campagne'),
+    path('dashboard/admin/', views.AdminDashboardView.as_view(), name='dashboard_admin'),
+    path('dashboard/admin/valider_hopital/<int:hopital_id>/', views.ValiderHopitalView.as_view(), name='valider_hopital'),
+    path('dashboard/admin/export_donneurs/', views.ExportDonneursCSVView.as_view(), name='export_donneurs_csv'),
+    path('campagnes/', views.CampagneListView.as_view(), name='list_campagnes'),
+    path('campagnes/<int:campagne_id>/inscrire/', views.InscrireCampagneView.as_view(), name='inscrire_campagne'),
 
     # Hospital Space
-    path('dashboard/hopital/', views.dashboard_hopital, name='dashboard_hopital'),
-    path('hopital/demandes/creer/', views.create_demande, name='create_demande'),
-    path('hopital/demandes/<int:demande_id>/modifier/', views.edit_demande, name='edit_demande'),
-    path('hopital/demandes/<int:demande_id>/cloturer/', views.close_demande, name='close_demande'),
-    path('hopital/demandes/<int:demande_id>/reponses/', views.view_reponses_demande, name='view_reponses_demande'),
-    path('hopital/reponses/<int:reponse_id>/notifier/', views.envoyer_notification, name='envoyer_notification'),
-    path('hopital/analyses/<int:analyse_id>/<str:decision>/', views.decider_analyse, name='decider_analyse'),
-    path('hopital/campagnes/creer/', views.create_campagne, name='create_campagne'),
+    path('dashboard/hopital/', views.HopitalDashboardView.as_view(), name='dashboard_hopital'),
+    path('hopital/demandes/creer/', views.DemandeCreateView.as_view(), name='create_demande'),
+    path('hopital/demandes/<int:demande_id>/modifier/', views.DemandeUpdateView.as_view(), name='edit_demande'),
+    path('hopital/demandes/<int:demande_id>/cloturer/', views.DemandeCloseView.as_view(), name='close_demande'),
+    path('hopital/demandes/<int:demande_id>/reponses/', views.DemandeReponsesView.as_view(), name='view_reponses_demande'),
+    path('hopital/reponses/<int:reponse_id>/notifier/', views.EnvoyerNotificationView.as_view(), name='envoyer_notification'),
+    path('hopital/analyses/<int:analyse_id>/<str:decision>/', views.DeciderAnalyseView.as_view(), name='decider_analyse'),
+    path('hopital/campagnes/creer/', views.CampagneCreateView.as_view(), name='create_campagne'),
+    path('hopital/dons/<int:don_id>/valider/', views.ValiderDonView.as_view(), name='valider_don'),
 
     # Donor Space
-    path('dashboard/donneur/', views.dashboard_donneur, name='dashboard_donneur'),
-    path('donneur/demandes/<int:demande_id>/repondre/', views.repondre_demande, name='repondre_demande'),
-    path('donneur/don/enregistrer/', views.enregistrer_don, name='enregistrer_don'),
-    path('donneur/analyse/envoyer/<int:notification_id>/', views.envoyer_analyse, name='envoyer_analyse'),
+    path('dashboard/donneur/', views.DonneurDashboardView.as_view(), name='dashboard_donneur'),
+    path('donneur/chatbot/', views.chatbot_view, name='chatbot'),
+    path('donneur/demandes/<int:demande_id>/repondre/', views.RepondreDemandeView.as_view(), name='repondre_demande'),
+    path('donneur/don/enregistrer/', views.DonCreateView.as_view(), name='enregistrer_don'),
+    path('donneur/analyse/envoyer/<int:notification_id>/', views.EnvoyerAnalyseView.as_view(), name='envoyer_analyse'),
 ]

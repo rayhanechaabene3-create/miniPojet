@@ -8,6 +8,43 @@
     </div>
 </div>
 
+<div class="card shadow-sm mb-4 border-success border-start border-3">
+    <div class="card-body">
+        <h4 class="card-title mb-4">Dons en attente de validation</h4>
+        {% if dons_en_attente %}
+        <div class="table-responsive">
+            <table class="table table-hover align-middle">
+                <thead class="table-light">
+                    <tr>
+                        <th>Date</th>
+                        <th>Donneur</th>
+                        <th>Groupe Sanguin</th>
+                        <th>Action</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for don in dons_en_attente %}
+                    <tr>
+                        <td>{{ don.date_don|date:"d M Y" }}</td>
+                        <td>{{ don.donneur.user.get_full_name|default:don.donneur.user.username }}</td>
+                        <td><span class="badge bg-danger fs-6">{{ don.donneur.groupe_sanguin }}</span></td>
+                        <td>
+                            <form method="post" action="{% url 'valider_don' don.id %}">
+                                {% csrf_token %}
+                                <button type="submit" class="btn btn-success btn-sm">Valider ce don</button>
+                            </form>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        {% else %}
+            <p class="text-muted">Aucun don en attente de validation pour le moment.</p>
+        {% endif %}
+    </div>
+</div>
+
 <div class="card shadow-sm">
     <div class="card-body">
         <h4 class="card-title mb-4">Historique des demandes urgentes</h4>

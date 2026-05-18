@@ -129,6 +129,8 @@ USE_TZ = True
 STATIC_URL = 'static/'
 #STATICFILES_DIRS = [ os.path.join(BASE_DIR,'static')]
 
+ANTHROPIC_API_KEY = os.environ.get('ANTHROPIC_API_KEY', '')
+
 N8N_WEBHOOK_URL = 'http://localhost:5678/webhook/commande-confirmation'
 N8N_NOUVEAU_PRODUIT_URL = 'http://localhost:5678/webhook/nouveau-produit'
 N8N_SOLDE_PRODUIT_URL = 'http://localhost:5678/webhook/solde-produit'

@@ -3,194 +3,309 @@
 {% block content %}
 <div class="row mb-4">
     <div class="col-12 d-flex justify-content-between align-items-center">
-        <h2 class="text-danger">Tableau de Bord Donneur</h2>
+        <h2 class="text-danger fw-bold"><i class="bi bi-speedometer2"></i> Tableau de Bord Donneur</h2>
         <div>
-            <a href="{% url 'list_campagnes' %}" class="btn btn-outline-danger me-2"><i class="bi bi-calendar-event"></i> Voir les Campagnes</a>
-            <a href="{% url 'enregistrer_don' %}" class="btn btn-primary"><i class="bi bi-droplet"></i> Enregistrer un don</a>
+            <a href="{% url 'chatbot' %}" class="btn btn-outline-danger me-2 shadow-sm"><i class="bi bi-chat-dots"></i> Assistant Donneur</a>
+            <a href="{% url 'enregistrer_don' %}" class="btn btn-danger shadow-sm"><i class="bi bi-droplet"></i> Enregistrer un don</a>
         </div>
     </div>
 </div>
 
-<div class="row">
-    <!-- Colonne de gauche : Infos et historique -->
-    <div class="col-md-4 mb-4">
-        <div class="card shadow-sm border-danger border-top border-3 mb-4">
-            <div class="card-body">
-                <h5 class="card-title">Statut d'éligibilité</h5>
-                
-                {% if not donneur.actif %}
-                    <div class="alert alert-warning mt-3">Votre compte est actuellement désactivé.</div>
-                {% elif prochaine_date %}
-                    {% if prochaine_date <= maintenant.date %}
-                        <div class="alert alert-success mt-3">Vous êtes éligible pour donner votre sang !</div>
-                    {% else %}
-                        <div class="alert alert-info mt-3">
-                            Prochaine disponibilité : <strong>{{ prochaine_date|date:"d M Y" }}</strong>
-                        </div>
-                    {% endif %}
-                {% else %}
-                    <div class="alert alert-success mt-3">Vous n'avez pas encore de don enregistré. Vous êtes probablement éligible !</div>
-                {% endif %}
-                
-                <p class="mb-1 text-muted"><small>Groupe Sanguin : <strong class="text-danger">{{ donneur.groupe_sanguin }}</strong></small></p>
-            </div>
-        </div>
+<!-- Menu des fonctionnalités (Tabs) -->
+<ul class="nav nav-tabs mb-4 border-danger" id="donneurTabs" role="tablist">
+  <li class="nav-item" role="presentation">
+    <button class="nav-link active text-danger fw-bold" id="stats-tab" data-bs-toggle="tab" data-bs-target="#stats" type="button" role="tab"><i class="bi bi-bar-chart-fill"></i> Mes Statistiques</button>
+  </li>
+  <li class="nav-item" role="presentation">
+    <button class="nav-link text-dark" id="profil-tab" data-bs-toggle="tab" data-bs-target="#profil" type="button" role="tab"><i class="bi bi-person-lines-fill"></i> Mon Profil & Historique</button>
+  </li>
+  <li class="nav-item" role="presentation">
+    <button class="nav-link text-dark" id="demandes-tab" data-bs-toggle="tab" data-bs-target="#demandes" type="button" role="tab"><i class="bi bi-heart-pulse-fill"></i> Appels Urgents</button>
+  </li>
+  <li class="nav-item" role="presentation">
+    <button class="nav-link text-dark" id="campagnes-tab" data-bs-toggle="tab" data-bs-target="#campagnes" type="button" role="tab"><i class="bi bi-calendar-event"></i> Mes Campagnes</button>
+  </li>
+  {% if notifications %}
+  <li class="nav-item" role="presentation">
+    <button class="nav-link text-dark" id="notifs-tab" data-bs-toggle="tab" data-bs-target="#notifs" type="button" role="tab">
+        <i class="bi bi-bell-fill"></i> Notifications <span class="badge bg-danger rounded-pill">{{ notifications|length }}</span>
+    </button>
+  </li>
+  {% endif %}
+</ul>
 
-        <div class="card shadow-sm">
-            <div class="card-body">
-                <h5 class="card-title">Historique de vos dons</h5>
-                {% if dons %}
-                    <ul class="list-group list-group-flush mt-3">
-                        {% for don in dons %}
-                            <li class="list-group-item px-0">
-                                <strong>{{ don.date_don|date:"d M Y" }}</strong><br>
-                                <small class="text-muted">{{ don.hopital.nom }}</small>
-                                {% if don.valide %}
-                                    <span class="badge bg-success float-end">Validé</span>
-                                {% else %}
-                                    <span class="badge bg-secondary float-end">En attente</span>
-                                {% endif %}
-                            </li>
-                        {% endfor %}
-                    </ul>
-                {% else %}
-                    <p class="text-muted mt-3">Aucun don enregistré.</p>
-                {% endif %}
-            </div>
-        </div>
+<div class="tab-content" id="donneurTabsContent">
 
-        <div class="card shadow-sm mt-4">
-            <div class="card-body">
-                <h5 class="card-title"><i class="bi bi-info-circle text-danger"></i> Tableau de Compatibilité</h5>
-                <div class="table-responsive mt-3">
-                    <table class="table table-sm table-bordered text-center">
-                        <thead class="table-light">
-                            <tr>
-                                <th>Receveur</th>
-                                <th>Peut recevoir de</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            <tr><td><strong>O-</strong></td><td>O-</td></tr>
-                            <tr><td><strong>O+</strong></td><td>O-, O+</td></tr>
-                            <tr><td><strong>B-</strong></td><td>B-, O-</td></tr>
-                            <tr><td><strong>B+</strong></td><td>B+, B-, O+, O-</td></tr>
-                            <tr><td><strong>A-</strong></td><td>A-, O-</td></tr>
-                            <tr><td><strong>A+</strong></td><td>A+, A-, O+, O-</td></tr>
-                            <tr><td><strong>AB-</strong></td><td>AB-, A-, B-, O-</td></tr>
-                            <tr><td><strong>AB+</strong></td><td>Tous</td></tr>
-                        </tbody>
-                    </table>
-                </div>
-            </div>
-        </div>
-    </div>
+  <!-- TAB 1: Statistiques (Visible par défaut) -->
+  <div class="tab-pane fade show active" id="stats" role="tabpanel">
+      <div class="row">
+          <div class="col-md-6 mb-4">
+              <div class="card bg-danger text-white shadow h-100 border-0 position-relative overflow-hidden">
+                  <div class="card-body p-5 text-center position-relative" style="z-index: 2;">
+                      <h4 class="text-uppercase mb-3 opacity-75">Total de vos dons</h4>
+                      <h1 class="display-1 fw-bolder mb-0">{{ dons|length }}</h1>
+                  </div>
+                  <i class="bi bi-droplet-fill position-absolute opacity-25" style="bottom: -20px; right: -10px; font-size: 12rem; z-index: 1;"></i>
+              </div>
+          </div>
+          <div class="col-md-6 mb-4">
+              <div class="card bg-white border-danger border-3 text-dark shadow h-100 position-relative overflow-hidden">
+                  <div class="card-body p-5 text-center position-relative" style="z-index: 2;">
+                      <h4 class="text-uppercase text-danger mb-3 opacity-75">Demandes compatibles <span class="badge bg-danger">{{ donneur.groupe_sanguin }}</span></h4>
+                      <h1 class="display-1 fw-bolder mb-0">{{ demandes_compatibles|length }}</h1>
+                  </div>
+                  <i class="bi bi-heart-pulse-fill text-danger position-absolute opacity-25" style="bottom: -20px; right: -10px; font-size: 12rem; z-index: 1;"></i>
+              </div>
+          </div>
+      </div>
+  </div>
 
-    <!-- Colonne de droite : Demandes et Inscriptions -->
-    <div class="col-md-8">
+  <!-- TAB 2: Profil & Historique -->
+  <div class="tab-pane fade" id="profil" role="tabpanel">
+      <div class="row">
+          <div class="col-md-5 mb-4">
+              <div class="card shadow-sm border-danger border-top border-3 h-100">
+                  <div class="card-body">
+                      <h5 class="card-title text-danger"><i class="bi bi-person-check-fill"></i> Statut d'éligibilité</h5>
+                      
+                      {% if not donneur.actif %}
+                          <div class="alert alert-warning mt-3 border-0 shadow-sm">Votre compte est actuellement désactivé.</div>
+                      {% elif prochaine_date %}
+                          {% if prochaine_date <= maintenant.date %}
+                              <div class="alert alert-success mt-3 border-0 shadow-sm"><i class="bi bi-check-circle-fill"></i> Vous êtes éligible pour donner votre sang !</div>
+                          {% else %}
+                              <div class="alert alert-info mt-3 border-0 shadow-sm">
+                                  Prochaine disponibilité : <strong>{{ prochaine_date|date:"d M Y" }}</strong>
+                              </div>
+                          {% endif %}
+                      {% else %}
+                          <div class="alert alert-success mt-3 border-0 shadow-sm"><i class="bi bi-check-circle-fill"></i> Vous n'avez pas encore de don enregistré. Vous êtes probablement éligible !</div>
+                      {% endif %}
+                      
+                      <hr>
+                      <p class="mb-1 text-muted fs-5">Groupe Sanguin : <strong class="text-danger fs-4">{{ donneur.groupe_sanguin }}</strong></p>
+                      <p class="mb-1 text-muted">Ville : <strong>{{ donneur.ville }}</strong></p>
+                  </div>
+              </div>
+          </div>
 
-        <!-- Notifications -->
-        {% if notifications %}
-        <div class="card shadow-sm mb-4 border-warning border-start border-3">
-            <div class="card-body">
-                <h4 class="card-title mb-3">&#128276; Notifications</h4>
-                {% for notif in notifications %}
-                <div class="mb-3 border rounded-3 p-3 {% if not notif.lu %}bg-warning bg-opacity-25{% else %}bg-light{% endif %}">
-                    <div class="d-flex justify-content-between align-items-start">
-                        <span><strong>{{ notif.message }}</strong></span>
-                        <small class="text-muted ms-3 text-nowrap">{{ notif.date|date:"d M Y H:i" }}</small>
-                    </div>
-                    <div class="mt-3">
-                        {% if notif.analyse %}
-                            {% if notif.analyse.statut == 'acceptee' %}
-                                <span class="badge bg-success fs-6">&#10003; Analyses acceptées</span>
-                            {% elif notif.analyse.statut == 'refusee' %}
-                                <span class="badge bg-danger fs-6">&#10007; Analyses refusées</span>
-                            {% else %}
-                                <span class="badge bg-warning text-dark">&#9203; Analyses envoyées — en attente de décision</span>
-                                <a href="{% url 'envoyer_analyse' notif.id %}" class="btn btn-sm btn-outline-danger ms-2">Mettre à jour</a>
-                            {% endif %}
-                        {% else %}
-                            <a href="{% url 'envoyer_analyse' notif.id %}" class="btn btn-danger btn-sm">
-                                &#128206; Envoyer mes analyses
-                            </a>
-                        {% endif %}
-                    </div>
-                </div>
-                {% endfor %}
-            </div>
-        </div>
-        {% endif %}
-        
-        <!-- Section Campagnes -->
-        <div class="card shadow-sm mb-4">
-            <div class="card-body">
-                <h4 class="card-title mb-4">Vos Prochaines Collectes (Campagnes)</h4>
-                {% if inscriptions %}
-                    <div class="list-group">
-                        {% for inscription in inscriptions %}
-                            <div class="list-group-item list-group-item-action flex-column align-items-start border-start border-4 border-danger mb-2 shadow-sm rounded">
-                                <div class="d-flex w-100 justify-content-between">
-                                    <h5 class="mb-1 text-danger">{{ inscription.campagne.nom }}</h5>
-                                    <small class="text-muted">{{ inscription.campagne.date|date:"d M Y" }}</small>
-                                </div>
-                                <p class="mb-1"><i class="bi bi-geo-alt"></i> {{ inscription.campagne.lieu }}</p>
-                                <p class="mb-0 fw-bold">Rendez-vous à : <span class="badge bg-danger">{{ inscription.creneau_horaire|time:"H:i" }}</span></p>
-                            </div>
-                        {% endfor %}
-                    </div>
-                {% else %}
-                    <p class="text-muted">Vous n'êtes inscrit à aucune campagne pour le moment.</p>
-                {% endif %}
-            </div>
-        </div>
+          <div class="col-md-7 mb-4">
+              <div class="card shadow-sm h-100">
+                  <div class="card-body">
+                      <h5 class="card-title text-danger"><i class="bi bi-clock-history"></i> Historique de vos dons</h5>
+                      {% if dons %}
+                          <div class="table-responsive mt-3">
+                              <table class="table table-hover">
+                                  <thead class="table-light">
+                                      <tr>
+                                          <th>Date</th>
+                                          <th>Hôpital</th>
+                                          <th>Statut</th>
+                                      </tr>
+                                  </thead>
+                                  <tbody>
+                                      {% for don in dons %}
+                                      <tr>
+                                          <td><strong>{{ don.date_don|date:"d M Y" }}</strong></td>
+                                          <td>{{ don.hopital.nom }}</td>
+                                          <td>
+                                              {% if don.valide %}
+                                                  <span class="badge bg-success">Validé</span>
+                                              {% else %}
+                                                  <span class="badge bg-secondary">En attente</span>
+                                              {% endif %}
+                                          </td>
+                                      </tr>
+                                      {% endfor %}
+                                  </tbody>
+                              </table>
+                          </div>
+                      {% else %}
+                          <p class="text-muted mt-3">Aucun don enregistré pour le moment.</p>
+                      {% endif %}
+                  </div>
+              </div>
+          </div>
+          
+          <!-- Tableau de compatibilité -->
+          <div class="col-12 mb-4">
+              <div class="card shadow-sm">
+                  <div class="card-body">
+                      <h5 class="card-title"><i class="bi bi-info-circle text-danger"></i> Tableau de Compatibilité</h5>
+                      <div class="table-responsive mt-3">
+                          <table class="table table-sm table-bordered text-center">
+                              <thead class="table-light">
+                                  <tr>
+                                      <th>Receveur</th>
+                                      <th>Peut recevoir de</th>
+                                  </tr>
+                              </thead>
+                              <tbody>
+                                  <tr><td><strong>O-</strong></td><td>O-</td></tr>
+                                  <tr><td><strong>O+</strong></td><td>O-, O+</td></tr>
+                                  <tr><td><strong>B-</strong></td><td>B-, O-</td></tr>
+                                  <tr><td><strong>B+</strong></td><td>B+, B-, O+, O-</td></tr>
+                                  <tr><td><strong>A-</strong></td><td>A-, O-</td></tr>
+                                  <tr><td><strong>A+</strong></td><td>A+, A-, O+, O-</td></tr>
+                                  <tr><td><strong>AB-</strong></td><td>AB-, A-, B-, O-</td></tr>
+                                  <tr><td><strong>AB+</strong></td><td>Tous</td></tr>
+                              </tbody>
+                          </table>
+                      </div>
+                  </div>
+              </div>
+          </div>
+      </div>
+  </div>
 
-        <div class="card shadow-sm">
-            <div class="card-body">
-                <h4 class="card-title mb-4">Appels urgents compatibles avec votre groupe <span class="badge bg-danger">{{ donneur.groupe_sanguin }}</span></h4>
-                
-                {% if demandes_compatibles %}
-                    <p class="text-muted small mb-3">{{ demandes_compatibles|length }} demande{{ demandes_compatibles|length|pluralize }} trouvée{{ demandes_compatibles|length|pluralize }} pour votre groupe sanguin.</p>
-                    {% for demande in demandes_compatibles %}
-                        <div class="card mb-3 border-danger shadow-sm">
-                            <div class="card-body">
-                                <div class="d-flex justify-content-between">
-                                    <h5 class="card-title text-danger">Besoin de {{ demande.groupe_sanguin }}</h5>
-                                    {% if demande.id in mes_reponses %}
-                                        <span class="badge bg-success">Intention envoyée</span>
-                                    {% endif %}
-                                </div>
-                                <h6 class="card-subtitle mb-2 text-muted">{{ demande.hopital.nom }}</h6>
-                                <p class="card-text">{{ demande.description }}</p>
-                                <ul class="list-unstyled">
-                                    <li><strong>Quantité :</strong> {{ demande.quantite }} poches</li>
-                                    <li><strong>Délai max :</strong> {{ demande.delai|date:"d M Y H:i" }}</li>
-                                </ul>
-                                
-                                {% if demande.id not in mes_reponses and donneur.actif %}
-                                    <form method="post" action="{% url 'repondre_demande' demande.id %}">
-                                        {% csrf_token %}
-                                        <button type="submit" class="btn btn-outline-danger btn-sm" onclick="return confirm('Confirmez-vous votre intention de donner pour cet appel ? L\'hôpital sera notifié.');">
-                                            Répondre à l'appel
-                                        </button>
-                                    </form>
-                                {% endif %}
-                            </div>
-                        </div>
-                    {% endfor %}
-                {% else %}
-                    <p class="text-muted">Aucune demande urgente compatible pour le moment. Merci pour votre disponibilité !</p>
-                {% endif %}
-            </div>
-        </div>
-    </div>
+  <!-- TAB 3: Appels Urgents -->
+  <div class="tab-pane fade" id="demandes" role="tabpanel">
+      <div class="card shadow-sm border-0">
+          <div class="card-body p-4">
+              <h4 class="card-title text-danger mb-4"><i class="bi bi-heart-pulse-fill"></i> Appels urgents compatibles avec votre groupe <span class="badge bg-danger">{{ donneur.groupe_sanguin }}</span></h4>
+              
+              {% if demandes_compatibles %}
+                  <p class="text-muted mb-4">{{ demandes_compatibles|length }} demande{{ demandes_compatibles|length|pluralize }} trouvée{{ demandes_compatibles|length|pluralize }}. Votre sang peut sauver des vies aujourd'hui !</p>
+                  
+                  <div class="row">
+                  {% for demande in demandes_compatibles %}
+                      <div class="col-md-6 mb-4">
+                          <div class="card h-100 border-danger shadow-sm">
+                              <div class="card-body">
+                                  <div class="d-flex justify-content-between mb-2">
+                                      <h5 class="card-title text-danger fw-bold">Besoin de {{ demande.groupe_sanguin }}</h5>
+                                      {% if demande.id in mes_reponses %}
+                                          <span class="badge bg-success shadow-sm">Intention envoyée</span>
+                                      {% endif %}
+                                  </div>
+                                  <h6 class="card-subtitle mb-3 text-muted"><i class="bi bi-building"></i> {{ demande.hopital.nom }}</h6>
+                                  <p class="card-text">{{ demande.description }}</p>
+                                  
+                                  <div class="bg-light p-3 rounded mb-3">
+                                      <div class="row">
+                                          <div class="col-6"><strong>Quantité :</strong><br>{{ demande.quantite }} poches</div>
+                                          <div class="col-6"><strong>Délai :</strong><br><span class="text-danger fw-bold">{{ demande.delai|date:"d M Y H:i" }}</span></div>
+                                      </div>
+                                  </div>
+                                  
+                                  {% if demande.id not in mes_reponses and donneur.actif %}
+                                      <form method="post" action="{% url 'repondre_demande' demande.id %}">
+                                          {% csrf_token %}
+                                          <button type="submit" class="btn btn-danger w-100 shadow-sm" onclick="return confirm('Confirmez-vous votre intention de donner pour cet appel ? L\'hôpital sera notifié.');">
+                                              Répondre à cet appel
+                                          </button>
+                                      </form>
+                                  {% endif %}
+                              </div>
+                          </div>
+                      </div>
+                  {% endfor %}
+                  </div>
+              {% else %}
+                  <div class="text-center py-5">
+                      <i class="bi bi-emoji-smile fs-1 text-muted mb-3"></i>
+                      <p class="text-muted fs-5">Aucune demande urgente compatible pour le moment.<br>Merci pour votre disponibilité !</p>
+                  </div>
+              {% endif %}
+          </div>
+      </div>
+  </div>
+
+  <!-- TAB 4: Campagnes -->
+  <div class="tab-pane fade" id="campagnes" role="tabpanel">
+      <div class="card shadow-sm border-0">
+          <div class="card-body p-4">
+              <div class="d-flex justify-content-between align-items-center mb-4">
+                  <h4 class="card-title text-danger mb-0"><i class="bi bi-calendar-check"></i> Vos Prochaines Collectes (Campagnes)</h4>
+                  <a href="{% url 'list_campagnes' %}" class="btn btn-outline-danger btn-sm">S'inscrire à d'autres</a>
+              </div>
+              
+              {% if inscriptions %}
+                  <div class="row">
+                      {% for inscription in inscriptions %}
+                          <div class="col-md-6 mb-3">
+                              <div class="card border-start border-4 border-danger h-100 shadow-sm bg-light">
+                                  <div class="card-body">
+                                      <div class="d-flex w-100 justify-content-between mb-2">
+                                          <h5 class="mb-1 text-danger fw-bold">{{ inscription.campagne.nom }}</h5>
+                                          <span class="badge bg-dark">{{ inscription.campagne.date|date:"d M Y" }}</span>
+                                      </div>
+                                      <p class="mb-2"><i class="bi bi-geo-alt-fill text-danger"></i> {{ inscription.campagne.lieu }}</p>
+                                      <hr>
+                                      <p class="mb-0 fs-5">Rendez-vous à : <strong class="text-danger">{{ inscription.creneau_horaire|time:"H:i" }}</strong></p>
+                                  </div>
+                              </div>
+                          </div>
+                      {% endfor %}
+                  </div>
+              {% else %}
+                  <div class="text-center py-5">
+                      <i class="bi bi-calendar-x fs-1 text-muted mb-3"></i>
+                      <p class="text-muted fs-5">Vous n'êtes inscrit à aucune campagne pour le moment.</p>
+                      <a href="{% url 'list_campagnes' %}" class="btn btn-danger mt-2">Explorer les campagnes à venir</a>
+                  </div>
+              {% endif %}
+          </div>
+      </div>
+  </div>
+
+  <!-- TAB 5: Notifications -->
+  {% if notifications %}
+  <div class="tab-pane fade" id="notifs" role="tabpanel">
+      <div class="card shadow-sm border-0">
+          <div class="card-body p-4">
+              <h4 class="card-title text-warning mb-4"><i class="bi bi-bell-fill"></i> Vos Notifications</h4>
+              
+              <div class="list-group">
+                  {% for notif in notifications %}
+                  <div class="list-group-item list-group-item-action flex-column align-items-start border-start border-4 border-warning mb-2 shadow-sm rounded {% if not notif.lu %}bg-warning bg-opacity-10{% else %}bg-white{% endif %}">
+                      <div class="d-flex w-100 justify-content-between mb-2">
+                          <h6 class="mb-1 fw-bold">{{ notif.message }}</h6>
+                          <small class="text-muted">{{ notif.date|date:"d M Y H:i" }}</small>
+                      </div>
+                      
+                      <div class="mt-2">
+                          {% if notif.analyse %}
+                              {% if notif.analyse.statut == 'acceptee' %}
+                                  <span class="badge bg-success p-2"><i class="bi bi-check-circle"></i> Analyses acceptées</span>
+                              {% elif notif.analyse.statut == 'refusee' %}
+                                  <span class="badge bg-danger p-2"><i class="bi bi-x-circle"></i> Analyses refusées</span>
+                              {% else %}
+                                  <span class="badge bg-warning text-dark p-2"><i class="bi bi-hourglass-split"></i> Analyses envoyées — en attente</span>
+                                  <a href="{% url 'envoyer_analyse' notif.id %}" class="btn btn-sm btn-outline-dark ms-2">Mettre à jour</a>
+                              {% endif %}
+                          {% else %}
+                              <a href="{% url 'envoyer_analyse' notif.id %}" class="btn btn-warning btn-sm fw-bold">
+                                  <i class="bi bi-paperclip"></i> Envoyer mes analyses
+                              </a>
+                          {% endif %}
+                      </div>
+                  </div>
+                  {% endfor %}
+              </div>
+          </div>
+      </div>
+  </div>
+  {% endif %}
+
 </div>
 {% endblock %}
 
 {% block scripts %}
 <script>
+// Empêche le comportement de certains boutons si besoin
 document.querySelectorAll('.btn-outline-secondary[data-annuler]').forEach(function(btn) {
     btn.addEventListener('click', function(e) { e.stopPropagation(); });
 });
+
+// Activer le changement d'onglets visuellement (Bootstrap gère le reste)
+var triggerTabList = [].slice.call(document.querySelectorAll('#donneurTabs button'))
+triggerTabList.forEach(function (triggerEl) {
+  var tabTrigger = new bootstrap.Tab(triggerEl)
+  triggerEl.addEventListener('click', function (event) {
+    event.preventDefault()
+    tabTrigger.show()
+  })
+})
 </script>
 {% endblock %}

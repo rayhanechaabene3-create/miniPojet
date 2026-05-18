@@ -4,7 +4,11 @@
 <div class="row mb-4">
     <div class="col-12 d-flex justify-content-between align-items-center">
         <h2 class="text-danger"><i class="bi bi-speedometer2"></i> Tableau de Bord Administrateur</h2>
-        <a href="{% url 'export_donneurs_csv' %}" class="btn btn-outline-success"><i class="bi bi-file-earmark-spreadsheet"></i> Exporter la Liste des Donneurs (CSV)</a>
+        <div>
+
+            <a href="{% url 'export_donneurs_csv' %}" class="btn btn-outline-success"><i
+                    class="bi bi-file-earmark-spreadsheet"></i> Exporter la Liste des Donneurs (CSV)</a>
+        </div>
     </div>
 </div>
 
@@ -34,22 +38,24 @@
             <div class="card-body">
                 <h4 class="card-title text-danger mb-4"><i class="bi bi-building"></i> Validation des Hôpitaux</h4>
                 {% if hopitaux_attente %}
-                    <ul class="list-group">
-                        {% for hopital in hopitaux_attente %}
-                        <li class="list-group-item d-flex justify-content-between align-items-center">
-                            <div>
-                                <strong>{{ hopital.nom }}</strong><br>
-                                <small class="text-muted">{{ hopital.ville }} - Agrement: {{ hopital.agrement }}</small>
-                            </div>
-                            <form method="post" action="{% url 'valider_hopital' hopital.id %}">
-                                {% csrf_token %}
-                                <button type="submit" class="btn btn-success btn-sm"><i class="bi bi-check-circle"></i> Valider</button>
-                            </form>
-                        </li>
-                        {% endfor %}
-                    </ul>
+                <ul class="list-group">
+                    {% for hopital in hopitaux_attente %}
+                    <li class="list-group-item d-flex justify-content-between align-items-center">
+                        <div>
+                            <strong>{{ hopital.nom }}</strong><br>
+                            <small class="text-muted">{{ hopital.ville }} - Agrement: {{ hopital.agrement }}</small>
+                        </div>
+                        <form method="post" action="{% url 'valider_hopital' hopital.id %}">
+                            {% csrf_token %}
+                            <button type="submit" class="btn btn-success btn-sm"><i class="bi bi-check-circle"></i>
+                                Valider</button>
+                        </form>
+                    </li>
+                    {% endfor %}
+                </ul>
                 {% else %}
-                    <div class="alert alert-success mt-3"><i class="bi bi-check-circle-fill"></i> Tous les hôpitaux inscrits ont été validés.</div>
+                <div class="alert alert-success mt-3"><i class="bi bi-check-circle-fill"></i> Tous les hôpitaux inscrits
+                    ont été validés.</div>
                 {% endif %}
             </div>
         </div>
@@ -60,45 +66,142 @@
         <div class="card shadow-sm h-100">
             <div class="card-body">
                 <h4 class="card-title text-danger mb-4"><i class="bi bi-bar-chart"></i> Demandes Actives</h4>
-                
+
                 <ul class="nav nav-tabs" id="myTab" role="tablist">
                     <li class="nav-item" role="presentation">
-                        <button class="nav-link active text-danger fw-bold" id="groupe-tab" data-bs-toggle="tab" data-bs-target="#groupe" type="button" role="tab">Par Groupe Sanguin</button>
+                        <button class="nav-link active text-danger fw-bold" id="groupe-tab" data-bs-toggle="tab"
+                            data-bs-target="#groupe" type="button" role="tab">Par Groupe Sanguin</button>
                     </li>
                     <li class="nav-item" role="presentation">
-                        <button class="nav-link text-danger fw-bold" id="ville-tab" data-bs-toggle="tab" data-bs-target="#ville" type="button" role="tab">Par Ville</button>
+                        <button class="nav-link text-danger fw-bold" id="ville-tab" data-bs-toggle="tab"
+                            data-bs-target="#ville" type="button" role="tab">Par Ville</button>
                     </li>
                 </ul>
                 <div class="tab-content mt-3" id="myTabContent">
                     <div class="tab-pane fade show active p-2" id="groupe" role="tabpanel">
                         {% if demandes_actives %}
-                            <ul class="list-group list-group-flush">
-                                {% for demande in demandes_actives %}
-                                <li class="list-group-item d-flex justify-content-between align-items-center">
-                                    Groupe Sanguin {{ demande.groupe_sanguin }}
-                                    <span class="badge bg-danger rounded-pill fs-6">{{ demande.total }}</span>
-                                </li>
-                                {% endfor %}
-                            </ul>
+                        <ul class="list-group list-group-flush">
+                            {% for demande in demandes_actives %}
+                            <li class="list-group-item d-flex justify-content-between align-items-center">
+                                Groupe Sanguin {{ demande.groupe_sanguin }}
+                                <span class="badge bg-danger rounded-pill fs-6">{{ demande.total }}</span>
+                            </li>
+                            {% endfor %}
+                        </ul>
                         {% else %}
-                            <p class="text-muted">Aucune demande active.</p>
+                        <p class="text-muted">Aucune demande active.</p>
                         {% endif %}
                     </div>
                     <div class="tab-pane fade p-2" id="ville" role="tabpanel">
                         {% if demandes_par_ville %}
-                            <ul class="list-group list-group-flush">
-                                {% for demande in demandes_par_ville %}
-                                <li class="list-group-item d-flex justify-content-between align-items-center">
-                                    Ville de {{ demande.hopital__ville }}
-                                    <span class="badge bg-danger rounded-pill fs-6">{{ demande.total }}</span>
-                                </li>
-                                {% endfor %}
-                            </ul>
+                        <ul class="list-group list-group-flush">
+                            {% for demande in demandes_par_ville %}
+                            <li class="list-group-item d-flex justify-content-between align-items-center">
+                                Ville de {{ demande.hopital__ville }}
+                                <span class="badge bg-danger rounded-pill fs-6">{{ demande.total }}</span>
+                            </li>
+                            {% endfor %}
+                        </ul>
                         {% else %}
-                            <p class="text-muted">Aucune demande active.</p>
+                        <p class="text-muted">Aucune demande active.</p>
                         {% endif %}
                     </div>
                 </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row mt-4">
+    <!-- Liste des Donneurs -->
+    <div class="col-md-12 mb-4">
+        <div class="card shadow-sm border-danger border-top border-3">
+            <div class="card-body">
+                <h4 class="card-title text-danger mb-4"><i class="bi bi-people-fill"></i> Tous les Donneurs</h4>
+                {% if tous_les_donneurs %}
+                <div class="table-responsive">
+                    <table class="table table-hover align-middle table-sm">
+                        <thead class="table-light">
+                            <tr>
+                                <th>Nom Complet</th>
+                                <th>Email</th>
+                                <th>Sexe</th>
+                                <th>Groupe Sanguin</th>
+                                <th>Ville</th>
+                                <th>Actif</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for d in tous_les_donneurs %}
+                            <tr>
+                                <td>{{ d.user.get_full_name|default:d.user.username }}</td>
+                                <td>{{ d.user.email }}</td>
+                                <td>{{ d.get_sexe_display }}</td>
+                                <td><span class="badge bg-danger">{{ d.groupe_sanguin }}</span></td>
+                                <td>{{ d.ville }}</td>
+                                <td>
+                                    {% if d.actif %}
+                                    <span class="badge bg-success">Oui</span>
+                                    {% else %}
+                                    <span class="badge bg-secondary">Non</span>
+                                    {% endif %}
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+                {% else %}
+                <p class="text-muted">Aucun donneur enregistré.</p>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+
+    <!-- Liste des Hôpitaux -->
+    <div class="col-md-12 mb-4">
+        <div class="card shadow-sm border-danger border-top border-3">
+            <div class="card-body">
+                <h4 class="card-title text-danger mb-4"><i class="bi bi-building"></i> Tous les Hôpitaux</h4>
+                {% if tous_les_hopitaux %}
+                <div class="table-responsive">
+                    <table class="table table-hover align-middle table-sm">
+                        <thead class="table-light">
+                            <tr>
+                                <th>Nom de l'Hôpital</th>
+                                <th>Email</th>
+                                <th>Ville</th>
+                                <th>Agrément</th>
+                                <th>Statut</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for h in tous_les_hopitaux %}
+                            <tr>
+                                <td>{{ h.nom }}</td>
+                                <td>{{ h.user.email }}</td>
+                                <td>{{ h.ville }}</td>
+                                <td>{{ h.agrement }}</td>
+                                <td>
+                                    {% if h.valide %}
+                                    <span class="badge bg-success">Validé</span>
+                                    {% else %}
+                                    <span class="badge bg-warning text-dark me-2">En attente</span>
+                                    <form method="post" action="{% url 'valider_hopital' h.id %}" class="d-inline">
+                                        {% csrf_token %}
+                                        <button type="submit" class="btn btn-success btn-sm"><i
+                                                class="bi bi-check-circle"></i> Valider</button>
+                                    </form>
+                                    {% endif %}
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+                {% else %}
+                <p class="text-muted">Aucun hôpital enregistré.</p>
+                {% endif %}
             </div>
         </div>
     </div>

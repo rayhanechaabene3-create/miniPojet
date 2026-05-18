@@ -1,0 +1,42 @@
+{% extends 'miniProjet/base.html' %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-md-6 col-lg-5">
+        <div class="card shadow-sm border-0 border-top border-danger border-4 mt-5">
+            <div class="card-body p-4">
+                <h3 class="card-title text-center text-danger mb-4"><i class="bi bi-person-gear"></i> Modifier mon profil Administrateur</h3>
+                
+                <form method="post" novalidate>
+                    {% csrf_token %}
+                    
+                    <div class="mb-4">
+                        <h5 class="text-muted border-bottom pb-2 mb-3">Informations de connexion</h5>
+                        
+                        <div class="mb-3">
+                            <label class="form-label fw-bold">Nom d'utilisateur <span class="text-danger">*</span></label>
+                            {{ user_form.username }}
+                            {% if user_form.username.errors %}
+                                <div class="text-danger mt-1 small">{{ user_form.username.errors|join:", " }}</div>
+                            {% endif %}
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label class="form-label fw-bold">Email</label>
+                            {{ user_form.email }}
+                            {% if user_form.email.errors %}
+                                <div class="text-danger mt-1 small">{{ user_form.email.errors|join:", " }}</div>
+                            {% endif %}
+                        </div>
+                    </div>
+                    
+                    <div class="d-grid gap-2 mt-4">
+                        <button type="submit" class="btn btn-danger btn-lg"><i class="bi bi-save"></i> Enregistrer les modifications</button>
+                        <a href="{% url 'dashboard_admin' %}" class="btn btn-outline-secondary"><i class="bi bi-arrow-left"></i> Annuler et retourner au tableau de bord</a>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
